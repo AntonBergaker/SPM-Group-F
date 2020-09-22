@@ -1,2 +1,8 @@
+from board import Piece
+
 class Player:
-    pass
+    piece = Piece.Empty
+    pieces_amount = 12
+
+    def __init__(self, piece):
+        self.piece = piece

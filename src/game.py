@@ -13,18 +13,32 @@ class Game:
     eliminating = 0
 
     def get_player_from_piece(self, piece):
+        """Gets the player belong to a piece
+
+        Keyword arguments:
+        piece -- the piece to check
+        return -- the player belonging to the piece, or None if invalid piece
+        """
         if (piece == Piece.Black):
             return self.players[0]
         if (piece == Piece.White):
             return self.players[1]
         return None
 
-    # Returns if we got 3 in a row
     class PlaceResults:
         Failed = -1
         Placed = 1
         GotThree = 2
     def place_piece(self, piece, position):
+        """Places a piece at the given location.
+        If the placement was invalid it will return PlaceResults.Failed
+        If the placement resulted in a three it will return PlaceResults.GotThree
+        Otherwise it will return PlaceResults.Placed
+        
+        Keyword arguments:
+        piece -- the piece to place
+        return -- a PlaceResults result
+        """
         if (self.can_place_piece(piece, position) != self.CanPlaceResults.Ok):
             return self.PlaceResults.Failed
 

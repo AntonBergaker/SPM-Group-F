@@ -20,12 +20,13 @@ class Game:
         return None
 
     # Returns if we got 3 in a row
-    PlaceResultFailed = -1
-    PlaceResultPlaced = 1
-    PlaceResultGotThree = 2
+    class PlaceResults:
+        Failed = -1
+        Placed = 1
+        GotThree = 2
     def place_piece(self, piece, position):
-        if (self.can_place_piece(piece, position) != self.PlaceOk):
-            return self.PlaceResultFailed
+        if (self.can_place_piece(piece, position) != self.CanPlaceResults.Ok):
+            return self.PlaceResults.Failed
 
         self.board[position] = piece
         player = self.get_player_from_piece(self.turn)
@@ -36,44 +37,52 @@ class Game:
 
         if (self.board.has_three_at_position(piece, position)):
             self.eliminating = True
-            return self.PlaceResultGotThree
+            return self.PlaceResults.GotThree
         
         self.turn = self.board.get_other_piece(self.turn)
-        return self.PlaceResultPlaced
+        return self.PlaceResults.Placed
 
-    PlaceOk = 1
-    PlaceOccupied = -1
-    PlaceWrongPiece = -2
-    PlaceWrongState = -3
+    class CanPlaceResults:
+        Ok = 1
+        Occupied = -1
+        WrongPiece = -2
+        WrongState = -3
+        OutsideBoard = -4
     def can_place_piece(self, piece, position):
+        if (position < 0 or position > 23):
+            return self.CanPlaceResults.OutsideBoard
         if (self.turn != piece):
-            return self.PlaceWrongPiece
+            return self.CanPlaceResults.WrongPiece
         if (self.board[position] != Piece.Empty):
-            return self.PlaceOccupied
+            return self.CanPlaceResults.Occupied
         if (self.eliminating):
-            return self.PlaceWrongState
-        return self.PlaceOk
+            return self.CanPlaceResults.WrongState
+        return self.CanPlaceResults.Ok
 
     def eliminate_piece(self, position):
-        if (self.can_eliminate_piece(position) != self.EliminateOk):
+        if (self.can_eliminate_piece(position) != self.CanElimateResults.Ok):
             return False
         self.board[position] = Piece.Empty
         self.eliminating = False
         return True
     
-    EliminateOk = 1
-    EliminateNoPiece = -1
-    EliminateTargetAreThrees = -2
-    EliminateWrongPiece = -3
-    EliminateWrongState = -4
+    class CanElimateResults:
+        Ok = 1
+        NoPiece = -1
+        TargetAreThrees = -2
+        WrongPiece = -3
+        WrongState = -4
+        OutsideBoard = -5
     def can_eliminate_piece(self, position):
+        if (position < 0 or position > 23):
+            return self.CanElimateResults.OutsideBoard
         if (self.board[position] == Piece.Empty):
-            return self.EliminateNoPiece
+            return self.CanElimateResults.NoPiece
         if (self.board[position] == self.turn):
-            return self.EliminateWrongPiece
+            return self.CanElimateResults.WrongPiece
         if (self.eliminating == False):
-            return self.EliminateWrongState
+            return self.CanElimateResults.WrongState
         if (self.board.has_three_at_position(self.board.get_other_piece(self.turn) ,position)):
-            return self.EliminateTargetAreThrees
-        return self.EliminateOk
+            return self.CanElimateResults.TargetAreThrees
+        return self.CanElimateResults.Ok
     

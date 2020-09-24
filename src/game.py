@@ -82,8 +82,16 @@ class Game:
             return self.CanElimateResults.WrongPiece
         if (self.eliminating == False):
             return self.CanElimateResults.WrongState
-        if (self.board.has_three_at_position(self.board.get_other_piece(self.turn) ,position)):
+        
+        # If all opponent pieces are three, we can elimate anything
+        opponent_piece = self.board.get_other_piece(self.turn)
+        all_are_threes = True
+        for check_position in range(24):
+            pass
+
+        if (self.board.has_three_at_position(opponent_piece ,position)):
             return self.CanElimateResults.TargetAreThrees
+        
         return self.CanElimateResults.Ok
 
     class MoveResults:
@@ -91,8 +99,28 @@ class Game:
         GotThree = 2
         Failed = -1
     def move_piece(self, position, new_position):
+        """Moves a piece from a position to another.
+        Returns a MoveResults containing information about the move.
+        Returns Ok if the move was successful.
+        Returns GotThree if the resulting move resulted in threes.
+        Returns Failed if the move was invalid.
+
+        Keyword arguments:
+        position -- the position we move from
+        new_position -- the position we move to
+        return -- a MoveResults result
+        """
         if (self.can_move_piece(position, new_position) != self.CanMoveResults.Ok):
             return self.MoveResults.Failed
+        piece_at_old_position = self.board[position]
+        self.board[position] = Piece.Empty
+        self.board[new_position] = piece_at_old_position
+        
+        if (self.board.has_three_at_position(piece_at_old_position, new_position)):
+            self.eliminating = True
+            return self.MoveResults.GotThree
+        
+        return self.MoveResults.Ok
       
     class CanMoveResults:
         Ok = 1
@@ -100,8 +128,24 @@ class Game:
         SamePosition = -2
         OutsideBoard = -3
         NotAdjacent = -4
-        NewPositionOccupied = -5   
+        NewPositionOccupied = -5,
+        WrongState = -6   
     def can_move_piece(self, position, new_position):
+        """Checks if a piece at a position can be moved to the given position.
+        Returns a CanMoveResults containing information about the move.
+        Returns Ok if the move was successful.
+        Returns WrongPiece if the piece was not associated with the current turn.
+        Returns SamePosition if the position and the new position are the same.
+        Returns OutSideBoard if any position was outside the board.
+        Returns NotAdjacent if the two positions are not adjacent and adjacent movements are required.
+        Returns NewPositionOccupied if there's already a piece at the target location.
+        Returns WrongState if the game is not in a movement state
+
+        Keyword arguments:
+        position -- the position we move from
+        new_position -- the position we move to
+        return -- a CanMoveResult result
+        """
         if (position < 0 or position > 23 or
             new_position < 0 or new_position > 23):
             return self.CanMoveResults.Ok

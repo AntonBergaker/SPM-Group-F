@@ -70,6 +70,20 @@ class Game:
         WrongState = -3
         OutsideBoard = -4
     def can_place_piece(self, piece, position):
+        """ Checks wether the given position on board is valid to place piece.
+        Returns a CanPlaceResults describing which condition did not hold or if position is valid.
+
+        Returns Occupied if the given position is already occupied on the board.
+        Returns WrongPiece if the given piece does not match with current turn.
+        Returns WrongState if the current state is eliminating, which the player can not place a piece atm.
+        Returns OutsideBoard if the given position is outside board.
+        Otherwise it will return Ok and the player can place the piece in the given position.
+
+        Keyword arguments:
+        piece -- the piece to be placed on board
+        position -- position on the board where the piece will be placed
+        return -- A CanPlaceResults result
+        """
         if (position < 0 or position > 23):
             return self.CanPlaceResults.OutsideBoard
         if (self.turn != piece):
@@ -81,6 +95,14 @@ class Game:
         return self.CanPlaceResults.Ok
 
     def eliminate_piece(self, position):
+        """ Eliminates the piece on the given position and sets eliminating state to False.
+        Returns False if the piece on the given position can not be eliminated.
+        Otherwise returns True if the piece on the given position can be eliminated
+
+        Keyword arguments:
+        position -- position of a piece on the board to be eliminated
+        return -- True if piece on the given position can be eliminated, otherwise False.
+        """
         if (self.can_eliminate_piece(position) != self.CanElimateResults.Ok):
             return False
         self.board[position] = Piece.Empty

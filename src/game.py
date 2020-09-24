@@ -2,29 +2,50 @@ from board import Board, Piece
 from player import Player
 
 class Game:
+    """A representation of the game and its rules.
+    Contains a board located in the board variable.
+    Contains players located in an array inside the players variable
+    Contains the current turn located in the turn variable
+    """
+
     turn = Piece.Black
     board = Board()
     players = [Player(Piece.Black), Player(Piece.White)]
 
-    StatePlacing = 1
-    StateMoving = 2
-    state = 0
+    class BoardState:
+        Placing = 1
+        Moving = 2
+    state = BoardState.Placing
 
     eliminating = 0
 
     def get_player_from_piece(self, piece):
+        """Gets the player belong to a piece
+
+        Keyword arguments:
+        piece -- the piece to check
+        return -- the player belonging to the piece, or None if invalid piece
+        """
         if (piece == Piece.Black):
             return self.players[0]
         if (piece == Piece.White):
             return self.players[1]
         return None
 
-    # Returns if we got 3 in a row
     class PlaceResults:
         Failed = -1
         Placed = 1
         GotThree = 2
     def place_piece(self, piece, position):
+        """Places a piece at the given location.
+        If the placement was invalid it will return PlaceResults.Failed.
+        If the placement resulted in a three it will return PlaceResults.GotThree.
+        Otherwise it will return PlaceResults.Placed.
+
+        Keyword arguments:
+        piece -- the piece to place
+        return -- a PlaceResults result
+        """
         if (self.can_place_piece(piece, position) != self.CanPlaceResults.Ok):
             return self.PlaceResults.Failed
 
@@ -33,7 +54,7 @@ class Game:
         player.pieces_amount -= 1
 
         if (self.players[0].pieces_amount == 0 and self.players[1].pieces_amount == 0):
-            self.state = self.StateMoving
+            self.state = self.BoardState.Moving
 
         if (self.board.has_three_at_position(piece, position)):
             self.eliminating = True

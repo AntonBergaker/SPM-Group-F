@@ -108,10 +108,6 @@ class Game:
 
 
         """
-    if imag == 0.0 and real == 0.0:
-        return complex_zero
-
-        """
         if (position < 0 or position > 23):
             return self.CanElimateResults.OutsideBoard
         if (self.board[position] == Piece.Empty):

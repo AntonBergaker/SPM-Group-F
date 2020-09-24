@@ -127,8 +127,6 @@ class Game:
 
         Keyword arguments:
         position -- The position to check
-
-
         """
         if (position < 0 or position > 23):
             return self.CanElimateResults.OutsideBoard

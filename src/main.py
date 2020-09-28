@@ -4,5 +4,3 @@ from commandline import CommandLine
 
 game = Game()
 cmd = CommandLine(game)
-
-

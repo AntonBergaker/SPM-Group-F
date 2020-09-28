@@ -21,6 +21,7 @@ class Game:
 
     def get_player_from_piece(self, piece):
         """Gets the player belong to a piece
+
         Keyword arguments:
         piece -- the piece to check
         return -- the player belonging to the piece, or None if invalid piece
@@ -61,6 +62,7 @@ class Game:
         If the placement was invalid it will return PlaceResults.Failed.
         If the placement resulted in a three it will return PlaceResults.GotThree.
         Otherwise it will return PlaceResults.Placed.
+
         Keyword arguments:
         piece -- the piece to place
         return -- a PlaceResults result
@@ -90,11 +92,13 @@ class Game:
     def can_place_piece(self, piece, position):
         """ Checks wether the given position on board is valid to place piece.
         Returns a CanPlaceResults describing which condition did not hold or if position is valid.
+
         Returns Occupied if the given position is already occupied on the board.
         Returns WrongPiece if the given piece does not match with current turn.
         Returns WrongState if the current state is eliminating, which the player can not place a piece atm.
         Returns OutsideBoard if the given position is outside board.
         Otherwise it will return Ok and the player can place the piece in the given position.
+
         Keyword arguments:
         piece -- the piece to be placed on board
         position -- position on the board where the piece will be placed
@@ -114,6 +118,7 @@ class Game:
         """ Eliminates the piece on the given position and sets eliminating state to False.
         Returns False if the piece on the given position can not be eliminated.
         Otherwise returns True if the piece on the given position can be eliminated
+
         Keyword arguments:
         position -- position of a piece on the board to be eliminated
         return -- True if piece on the given position can be eliminated, otherwise False.
@@ -140,6 +145,7 @@ class Game:
         Returns WrongPiece when the target do not belong to the opponent and can not be eliminated
         Returns WrongState when it is not time to eliminate a piece
         Returns OutsideBoard when the target is outside the board and can not be eliminated
+
         Keyword arguments:
         position -- The position to check
         """
@@ -178,6 +184,7 @@ class Game:
         Returns Ok if the move was successful.
         Returns GotThree if the resulting move resulted in threes.
         Returns Failed if the move was invalid.
+
         Keyword arguments:
         position -- the position we move from
         new_position -- the position we move to
@@ -214,6 +221,7 @@ class Game:
         Returns NotAdjacent if the two positions are not adjacent and adjacent movements are required.
         Returns NewPositionOccupied if there's already a piece at the target location.
         Returns WrongState if the game is not in a movement state
+
         Keyword arguments:
         position -- the position we move from
         new_position -- the position we move to

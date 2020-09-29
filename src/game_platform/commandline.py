@@ -1,6 +1,11 @@
-from game import Game
-from board import Piece
+from .game import Game
+from .board import Piece
 import sys
+import os
+
+# Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
 
 class CommandLine:
     game = None
@@ -28,18 +33,18 @@ class CommandLine:
         else:
           board[x] = 'W'
 
-      print("\033c")
+      cls()
       print(" 1                            2                             3")
       print("  "+board[0]+"-----------------------------"+board[1]+"-----------------------------"+board[2])
-      print("  |⟍                            |                           ⟋ |")
-      print("  |  ⟍                          |                         ⟋   |")
-      print("  |    ⟍                        |                       ⟋     |")
-      print("  |      ⟍ 4                  5 |                   6 ⟋       |")
+      print("  |\\                            |                           / |")
+      print("  |  \\                          |                         /   |")
+      print("  |    \\                        |                       /     |")
+      print("  |      \\ 4                  5 |                   6 /       |")
       print("  |        "+board[3]+"--------------------"+board[4]+"--------------------"+board[5]+"        |")
-      print("  |        | ⟍                  |                 ⟋  |        |")
-      print("  |        |   ⟍                |               ⟋    |        |")
-      print("  |        |     ⟍              |             ⟋      |        |")
-      print("  |        |       ⟍ 7        8 |         9 ⟋        |        |")
+      print("  |        | \\                  |                 /  |        |")
+      print("  |        |   \\                |               /    |        |")
+      print("  |        |     \\              |             /      |        |")
+      print("  |        |       \\ 7        8 |         9 /        |        |")
       print("  |        |         "+board[6]+"----------"+board[7]+"----------"+board[8]+"         |        |")
       print("  |        |         |                     |         |        |")
       print("  |        |         |                     |         |        |")
@@ -48,19 +53,19 @@ class CommandLine:
       print("  |        |         |                     |         |        |")
       print("  |        |      16 |         17       18 |         |        |")
       print("  |        |         "+board[15]+"----------"+board[16]+"----------"+board[17]+"         |        |")
-      print("  |        |       ⟋            |            ⟍       |        |")
-      print("  |        |     ⟋              |              ⟍     |        |")
-      print("  |        |   ⟋                |                ⟍   |        |")
-      print("  |     19 | ⟋               20 |                  ⟍ | 21     |")
+      print("  |        |       /            |            \\       |        |")
+      print("  |        |     /              |              \\     |        |")
+      print("  |        |   /                |                \\   |        |")
+      print("  |     19 | /               20 |                  \\ | 21     |")
       print("  |        "+board[18]+"--------------------"+board[19]+"--------------------"+board[20]+"        |")
-      print("  |      ⟋                      |                      ⟍      |")
-      print("  |    ⟋                        |                        ⟍    |")
-      print("  |  ⟋                          |                          ⟍  |")
-      print("22|⟋                         23 |                          24⟍|")
+      print("  |      /                      |                      \\      |")
+      print("  |    /                        |                        \\    |")
+      print("  |  /                          |                          \\  |")
+      print("22|/                         23 |                          24\\|")
       print("  "+board[21]+"-----------------------------"+board[22]+"-----------------------------"+board[23]+"  ")
-      if (self.game.state == Game.GameState.Placing):
-        print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
-      pieces_presentation = [' '] * 63;
+      #if (self.game.state == Game.GameState.Placing):
+        #print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
+      pieces_presentation = [' '] * 63
       for i in range(self.game.players[0].pieces_amount):
         pieces_presentation[i] = 'B'
       for i in range(self.game.players[1].pieces_amount):
@@ -167,12 +172,12 @@ class CommandLine:
               break
 
         elif user_input == '2':
-          print("\033c")
+          cls()
           print("This is how you play....")
           print("TBA")
           menu_input = input('<- Back to main menu, input 1 and press enter: ')
           if menu_input == '1':
-            print("\033c")
+            cls()
 
         elif user_input == '3':
           return

@@ -39,7 +39,7 @@ class Board:
     ]
 
 
-    def get_lines_for_position(self, position):
+    def get_mills_for_position(self, position):
         """Looks for which mills the given position can be in.
         It will go through every possible mills to find those who contain the given position.
 		It will then return all possible mills that contains the given position.
@@ -65,14 +65,14 @@ class Board:
         position -- The position to look for in possible mills.
         return -- True if the given piece on the given position is in a mill. Otherwise False.
         """
-        lines = self.get_lines_for_position(position)
-        for mill in lines:
-            line_full = True
-            for position in line:
+        mills = self.get_mills_for_position(position)
+        for mill in mills:
+            mill_full = True
+            for position in mill:
                 if (self.board[position] != piece):
-                    line_full = False
+                    mill_full = False
                     break
-            if (line_full):
+            if (mill_full):
                 return True
 
         return False

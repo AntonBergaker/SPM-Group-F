@@ -1,5 +1,5 @@
-from board import Board, Piece
-from player import Player
+from .board import Board, Piece
+from .player import Player
 
 class Game:
     """A representation of the game and its rules.

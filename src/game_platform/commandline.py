@@ -4,7 +4,7 @@ import sys
 import os
 
 # Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
-def cls():
+def clear_screen():
     os.system('cls' if os.name=='nt' else 'clear')
 
 class CommandLine:
@@ -33,7 +33,7 @@ class CommandLine:
         else:
           board[x] = 'W'
 
-      cls()
+      clear_screen()
       print(" 1                            2                             3")
       print("  "+board[0]+"-----------------------------"+board[1]+"-----------------------------"+board[2])
       print("  |\\                            |                           / |")
@@ -172,12 +172,12 @@ class CommandLine:
               break
 
         elif user_input == '2':
-          cls()
+          clear_screen()
           print("This is how you play....")
           print("TBA")
           menu_input = input('<- Back to main menu, input 1 and press enter: ')
           if menu_input == '1':
-            cls()
+            clear_screen()
 
         elif user_input == '3':
           return

@@ -10,7 +10,7 @@ class Piece:
 class Board:
     """A representation of the board.
 	Contains a board located in variable board that is empty.
-	Contains all mill possibilities located in variable lines.
+	Contains all mill possibilities located in variable mills.
     """
 	
     board = None

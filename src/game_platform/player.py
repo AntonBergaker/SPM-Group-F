@@ -1,4 +1,4 @@
-from board import Piece
+from .board import Piece
 
 class Player:
     """A representation of the player.

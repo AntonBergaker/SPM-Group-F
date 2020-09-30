@@ -38,6 +38,25 @@ class Board:
         [16, 19, 22]
     ]
 
+    def pieces_of_type_on_board(self, piece):
+        count = 0
+        for piece_in_board in self.board:
+            if (piece == piece_in_board):
+                count += 1
+        return count
+
+    def positions_are_adjacent(self, position, other_position):
+        if (position == other_position):
+            return False
+
+        lines = self.get_lines_for_position(position)
+        for line in lines:
+            if (other_position in line):
+                if (abs(line.index(position) - line.index(other_position)) == 1):
+                    return True
+        
+        return False
+
 
     def get_mills_for_position(self, position):
         """Looks for which mills the given position can be in.

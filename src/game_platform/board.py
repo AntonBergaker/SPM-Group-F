@@ -9,13 +9,13 @@ class Piece:
 
 class Board:
     """A representation of the board.
-	Contains a board located in variable board that is empty.
-	Contains all mill possibilities located in variable mills.
+	Contains a board located in variable board that is filled with 24 empty positions.
+	Contains all mill possibilities located in variable lines.
     """
 	
-    board = None
+    board = [Piece.Empty] * 24
 
-    mills = [
+    lines = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -39,6 +39,12 @@ class Board:
     ]
 
     def pieces_of_type_on_board(self, piece):
+        """Counts how many of the given piece is on the board.
+
+        Keyword arguments:
+        piece -- The piece to count.
+        return -- The amount of the given piece that is on the board.
+        """
         count = 0
         for piece_in_board in self.board:
             if (piece == piece_in_board):
@@ -46,6 +52,13 @@ class Board:
         return count
 
     def positions_are_adjacent(self, position, other_position):
+        """Checks if the given position and the given other_position are adjacent to each other on the board.
+
+        Keyword arguments:
+        position -- The first position.
+        other_position -- The second position.
+        return -- True if both positions are adjacent to each other. Otherwise False.
+        """
         if (position == other_position):
             return False
 
@@ -57,41 +70,39 @@ class Board:
         
         return False
 
-
-    def get_mills_for_position(self, position):
-        """Looks for which mills the given position can be in.
-        It will go through every possible mills to find those who contain the given position.
-		It will then return all possible mills that contains the given position.
+    def get_lines_for_position(self, position):
+        """Looks for which lines the given position can be in.
+        It will go through every line to find those who contain the given position.
+		It will then return all lines that contains the given position.
 
         Keyword arguments:
-        position -- The position to look for in possible mills.
-        return -- An array of all possible mills the given position can be in.
+        position -- The position to look for in lines.
+        return -- An array of all lines the given position can be in.
         """
-        found_mills = []
+        found_lines = []
 
-        for mill in self.mills:
-            if (position in mill):
-                found_mills.append(mill)
+        for line in self.lines:
+            if (position in line):
+                found_lines.append(line)
 
-        return found_mills
+        return found_lines
 
     def has_three_at_position(self, piece, position):
-        """Looks for possible mills the given position can be in.
-        It will look at the mills the given piece on the given position can be at and check if any of the mills are actual mills.
+        """Checks wether the given piece on the given position is in a mill.
 		
         Keyword arguments:
-        piece - The piece to check if it is in a mill.
+        piece -- The piece to check if it is in a mill.
         position -- The position to look for in possible mills.
         return -- True if the given piece on the given position is in a mill. Otherwise False.
         """
-        mills = self.get_mills_for_position(position)
-        for mill in mills:
-            mill_full = True
-            for position in mill:
+        lines = self.get_lines_for_position(position)
+        for line in lines:
+            line_full = True
+            for position in line:
                 if (self.board[position] != piece):
-                    mill_full = False
+                    line_full = False
                     break
-            if (mill_full):
+            if (line_full):
                 return True
 
         return False
@@ -101,7 +112,7 @@ class Board:
         If the given piece is Piece.Black it will return Piece.White and vice versa. Otherwise it will return Piece.Empty.
 
         Keyword arguments:
-        piece - The given color to get its opposite color.
+        piece -- The given color to get its opposite color.
         return -- Returns Piece.White if the given piece is Piece.Black and vice versa. Otherwise it will return Piece.Empty.
         """
         if (piece == Piece.Black):
@@ -114,7 +125,7 @@ class Board:
         """Gets what is on the given position on the board.
 
         Keyword arguments:
-        index - An index on the board
+        index -- An index on the board
         return -- Returns what is on the given index on the board.
         """
         return self.board[index]
@@ -123,16 +134,8 @@ class Board:
         """Updates the board on the given index with the given value.
 
         Keyword arguments:
-        index - An index on the board to place the given value.
-        value - The value to be placed on the given index on the board.
+        index -- An index on the board to place the given value.
+        value -- The value to be placed on the given index on the board.
         return -- Returns nothing. Sets the given value on the given index on the board.
         """
         self.board[index] = value
-
-    def __init__(self):
-        """Initiates the board with 24 empty positions.
-
-        Keyword arguments:
-        return -- Returns nothing. Initiates the board with 24 empty positions.
-        """
-        self.board = [Piece.Empty] * 24

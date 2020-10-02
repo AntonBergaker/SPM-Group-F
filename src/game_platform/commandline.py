@@ -6,26 +6,40 @@ import colorama
 
 # Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
 def clear_screen():
+    """Clears the terminal."""
     os.system('cls' if os.name=='nt' else 'clear')
 
 class CommandLine:
+    """Handles the GUI and the user's input. Contains a game in the variable game."""
     game = None
 
     def input_number(self, prompt):
+      """Checks if the user's given input is an integer. If the user's input is q or Q the program will exit.
+        It will keep asking the user for an input until it is valid.
+
+        Keyword arguments:
+        prompt -- The message to be printed to the user.
+        return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
+      """
       while True:
         result = input(prompt)
         if (result == 'q' or result == 'Q'):
           sys.exit()
         if result.isdigit():
           return int(result)
-      
 
     def __init__(self, game : Game):
+        """Initializes the given game into class variable game and starts the main menu."""
         self.game = game
         self.menu()
         colorama.init()
 
     def print_board(self):
+      """Prints the board and the pieces on the board. It also prints how many pieces each player has.
+
+        Keyword arguments:
+        return -- Prints out the board.
+      """
       board = [""] * 24
 
       reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
@@ -108,12 +122,24 @@ class CommandLine:
 
 
     def identify_piece(self, turn):
+      """ Identifies which player's turn it is.
+
+        Keyword arguments:
+        turn -- The current turn of the game.
+        return -- Returns Black if the given turn is 1 or White if the given turn is 2.
+      """
       if turn == 1:
         return 'Black'
       if turn == 2:
         return 'White'
 
     def eliminate(self):
+      """Gets the user's input on which opponent piece it wants to eliminate when the user has created a mill.
+        Depending on the user's input, different messages will be printed out. If the user chooses a valid opponent piece, the opponent piece will be removed.
+
+        Keyword arguments:
+        return -- Prints out different messages depending on the user's input and updates the board accordingly.
+      """
       self.print_board()
       print(self.identify_piece(self.game.turn) + ' player has three in a row!')
       
@@ -135,6 +161,15 @@ class CommandLine:
           print("Something went wrong")
 
     def play(self):
+      """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
+        Depending on the user's input, different messages will be printed out. If the user places a piece on which it creates a mill, the user will be asked which
+        opponent piece it wants to eliminate. If the game state is on state Moving then it will ask the user which one of its pieces it wants to move. Depending on the
+        user's input, different messages will be printed out. If the user moves its piece on another valid position which it creates a mill, the user will be
+        asked which opponent piece it wants to eliminate.
+
+        Keyword arguments:
+        return -- Prints out different messages depending on the user's input and updates the board accordingly.
+      """
       print('Its '+ self.identify_piece(self.game.turn) + ' player\'s turn to play')
       if self.game.state == Game.GameState.Placing:
         while True:
@@ -184,6 +219,14 @@ class CommandLine:
             print("Something went wrong.")
 
     def menu(self):
+      """Prints out the menu and gets the user's input.
+        If the input is 1, it will start the game. It will check after every turn if any player has won. If a player has won, it will print who won and the menu again.
+        If the input is 2, it will describe how to play the game.
+        If the input is 3, it will quit the program.
+
+        Keyword arguments:
+        return -- Prints out the menu which the user can choose from.
+      """
       while True:
         print('### UU-GAME ###')
         print('1. Play a new game')
@@ -215,4 +258,3 @@ class CommandLine:
 
         elif user_input == '3':
           return
-              

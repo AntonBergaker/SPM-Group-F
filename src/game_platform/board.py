@@ -1,10 +1,19 @@
 class Piece:
+    """A representation of the color of the pieces.
+	A piece is Empty if it has not been assigned a color yet. Otherwise it is Black or White.
+    """
+	
     Empty = 0
     Black = 1
     White = 2
 
 class Board:
-    board = None
+    """A representation of the board.
+	Contains a board located in variable board that is filled with 24 empty positions.
+	Contains all mill possibilities located in variable lines.
+    """
+	
+    board = [Piece.Empty] * 24
 
     lines = [
         [0, 1, 2],
@@ -30,6 +39,12 @@ class Board:
     ]
 
     def pieces_of_type_on_board(self, piece):
+        """Counts how many of the given piece is on the board.
+
+        Keyword arguments:
+        piece -- The piece to count.
+        return -- The amount of the given piece that is on the board.
+        """
         count = 0
         for piece_in_board in self.board:
             if (piece == piece_in_board):
@@ -37,6 +52,13 @@ class Board:
         return count
 
     def positions_are_adjacent(self, position, other_position):
+        """Checks if the given position and the given other_position are adjacent to each other on the board.
+
+        Keyword arguments:
+        position -- The first position.
+        other_position -- The second position.
+        return -- True if both positions are adjacent to each other. Otherwise False.
+        """
         if (position == other_position):
             return False
 
@@ -48,8 +70,15 @@ class Board:
         
         return False
 
-
     def get_lines_for_position(self, position):
+        """Looks for which lines the given position can be in.
+        It will go through every line to find those who contain the given position.
+		It will then return all lines that contains the given position.
+
+        Keyword arguments:
+        position -- The position to look for in lines.
+        return -- An array of all lines the given position can be in.
+        """
         found_lines = []
 
         for line in self.lines:
@@ -59,6 +88,13 @@ class Board:
         return found_lines
 
     def has_three_at_position(self, piece, position):
+        """Checks wether the given piece on the given position is in a mill.
+		
+        Keyword arguments:
+        piece -- The piece to check if it is in a mill.
+        position -- The position to look for in possible mills.
+        return -- True if the given piece on the given position is in a mill. Otherwise False.
+        """
         lines = self.get_lines_for_position(position)
         for line in lines:
             line_full = True
@@ -72,6 +108,13 @@ class Board:
         return False
 
     def get_other_piece(self, piece):
+        """Gets the opposite color of the given piece.
+        If the given piece is Piece.Black it will return Piece.White and vice versa. Otherwise it will return Piece.Empty.
+
+        Keyword arguments:
+        piece -- The given color to get its opposite color.
+        return -- Returns Piece.White if the given piece is Piece.Black and vice versa. Otherwise it will return Piece.Empty.
+        """
         if (piece == Piece.Black):
             return Piece.White
         if (piece == Piece.White):
@@ -79,10 +122,20 @@ class Board:
         return Piece.Empty
 
     def __getitem__(self, index):
+        """Gets what is on the given position on the board.
+
+        Keyword arguments:
+        index -- An index on the board
+        return -- Returns what is on the given index on the board.
+        """
         return self.board[index]
 
     def __setitem__(self, index, value):
-        self.board[index] = value
+        """Updates the board on the given index with the given value.
 
-    def __init__(self):
-        self.board = [Piece.Empty] * 24
+        Keyword arguments:
+        index -- An index on the board to place the given value.
+        value -- The value to be placed on the given index on the board.
+        return -- Returns nothing. Sets the given value on the given index on the board.
+        """
+        self.board[index] = value

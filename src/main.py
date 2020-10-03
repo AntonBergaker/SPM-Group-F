@@ -1,5 +1,4 @@
-from game import Game
-from commandline import CommandLine
+import game_platform
 
-game = Game()
-cmd = CommandLine(game)
+game = game_platform.Game()
+cmd = game_platform.CommandLine(game)

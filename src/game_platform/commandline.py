@@ -268,22 +268,24 @@ class CommandLine:
         elif user_input == '3':
           clear_screen()
           self.print_board()
-          print('This is preview of the board.')
-          print('Black players pieces are denoted by'+colorama.Fore.MAGENTA + ' B'+colorama.Style.RESET_ALL+' and white players pieces are denoted by'+colorama.Style.BRIGHT+' W'+colorama.Style.RESET_ALL)
-          print('The pieces you have not placed yet are represented below the board')
-          print('')
-          print('Both players in the game will have twelve pieces each and have twenty four places to place on the board.')
-          print('The player who starts fist will always be black')
-          print('The board starts empty and each player will have to place their pieces on the board taking turns.')
-          print('You can take your opponents piece out of the board if you have a three in a row.')
-          print('Three in a row can be done horizontally, vertically or even diagonally.')
-          print('Once all the pieces are placed on the board, each player can move their pieces to adjacent empty places along the lines')
-          print('When a player has three pieces left on the board, the player can move their pieces to any empty place on the board.')
-          print('')
-          print('A player will win the game if you satisfy any of these two conditions')
-          print('1. When their opponent’s pieces are reduced to less than three')
-          print('2. If you can surround your opponent’s pieces making them unable to move or match three in a row')
-          print('')
+          howto_text=f"""
+          This is preview of the board.
+          Black players pieces are denoted by {colorama.Fore.MAGENTA}B{colorama.Style.RESET_ALL} and white players pieces are denoted by {colorama.Style.BRIGHT}W{colorama.Style.RESET_ALL}
+          The pieces you have not placed yet are represented below the board'
+          
+          * Both players in the game will have twelve pieces each and have twenty four places to place on the board.
+          * The player who starts fist will always be black
+          * The board starts empty and each player will have to place their pieces on the board taking turns.
+          * You can take your opponents piece out of the board if you have a three in a row.
+          * Three in a row can be done horizontally, vertically or even diagonally.
+          * Once all the pieces are placed on the board, each player can move their pieces to adjacent empty places along the lines
+          * When a player has three pieces left on the board, the player can move their pieces to any empty place on the board.
+          
+          A player will win the game if you satisfy any of these two conditions
+          1. When their opponent’s pieces are reduced to less than three
+          2. If you can surround your opponent’s pieces making them unable to move or match three in a row
+          """
+          print(howto_text)
           menu_input = input('<- Back to main menu, input 1 and press enter: ')
           if menu_input == '1':
             clear_screen()

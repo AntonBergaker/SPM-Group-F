@@ -28,7 +28,7 @@ class CommandLine:
           return int(result)
 
     def __init__(self):
-        """Initializes the given game into class variable game and starts the main menu."""
+        """When initialized, it will start the main menu."""
         self.menu()
 
     def print_board(self):
@@ -127,9 +127,8 @@ class CommandLine:
 
 
     def place(self):
-        """Gets the user's input on where to place.
+        """Ask the user for input on where to place, and then places there.
         Depending on the user's input, different messages will be printed out. If the user chooses a valid position, a piece will be placed.
-        Prints out different messages depending on the user's input and updates the board accordingly.
 
         Keyword arguments:
         """
@@ -156,7 +155,6 @@ class CommandLine:
     def move(self):
         """Gets the user's input on where to move.
         Depending on the user's input, different messages will be printed out. If the user chooses a valid position, a piece will be moved.
-        Prints out different messages depending on the user's input and updates the board accordingly.
 
         Keyword arguments:
         """
@@ -204,7 +202,7 @@ class CommandLine:
 
     def menu(self):
       """Prints out the menu and gets the user's input.
-        If the input is 1, it will start the game. It will check after every turn if any player has won. If a player has won, it will print who won and the menu again.
+        If the input is 1, it will create and start the game. It will check after every turn if any player has won. If a player has won, it will print who won and the menu again.
         If the input is 2, it will describe how to play the game.
         If the input is 3, it will quit the program.
 

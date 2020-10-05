@@ -202,7 +202,7 @@ class Game:
 
         self.turn = self.board.get_other_piece(self.turn)
         return self.MoveResults.Ok
-      
+
     class CanMoveResults:
         Ok = 1
         WrongPiece = -1
@@ -211,6 +211,29 @@ class Game:
         NotAdjacent = -4
         NewPositionOccupied = -5,
         WrongState = -6   
+    def can_move_piece_from(self, position, ignore_turn = False):
+        """Checks if a piece at a position can be moved from the given position.
+        Returns a CanMoveResults containing information about the move.
+        Returns Ok if the move was successful.
+        Returns WrongPiece if the piece was not associated with the current turn.
+        Returns OutSideBoard if the position was outside the board.
+        Returns WrongState if the game is not in a movement state
+
+        Keyword arguments:
+        position -- the position we move from
+        ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
+        return -- a CanMoveResult result that shows how to implement
+        """
+        if (position < 0 or position > 23):
+            return Game.CanMoveResults.OutsideBoard
+        if (ignore_turn == False and self.turn != self.board[position]):
+            return Game.CanMoveResults.WrongPiece
+        if (self.state != Game.GameStage.Moving):
+            return Game.CanMoveResults.WrongState
+
+        return Game.CanMoveResults.Ok
+        
+
     def can_move_piece(self, position, new_position, ignore_turn = False):
         """Checks if a piece at a position can be moved to the given position.
         Returns a CanMoveResults containing information about the move.
@@ -228,11 +251,13 @@ class Game:
         ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
         return -- a CanMoveResult result
         """
-        if (position < 0 or position > 23 or
-            new_position < 0 or new_position > 23):
-            return self.CanMoveResults.Ok
-        if (ignore_turn == False and self.turn != self.board[position]):
-            return self.CanMoveResults.WrongPiece
+
+        can_move_from_result = self.can_move_piece_from(position, ignore_turn)
+        if (can_move_from_result != Game.CanMoveResults.Ok):
+            return can_move_from_result 
+
+        if (new_position < 0 or new_position > 23):
+            return self.CanMoveResults.OutsideBoard
         if (position == new_position):
             return self.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
@@ -246,3 +271,18 @@ class Game:
                 return self.CanMoveResults.NotAdjacent
 
         return self.CanMoveResults.Ok
+
+
+    def get_valid_moves_from_position(self, position, ignore_turn = False):
+        """Gets a list of valid moves from a position
+
+        Keyword arguments:
+        position -- the position we move from
+        ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
+        return -- a list of positions we can move
+        """
+        valid_moves = []
+        for i in range(24):
+            if (self.can_move_piece(position, i, ignore_turn) == Game.CanMoveResults.Ok):
+                valid_moves.append(i)
+        return valid_moves

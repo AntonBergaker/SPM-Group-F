@@ -28,6 +28,24 @@ class CommandLine:
         if result.isdigit():
           return int(result)
 
+    def input_number_or_other(self, prompt, other):
+      """Checks if the user's given input is an integer or inside other. If the user's input is q or Q the program will exit.
+      It will keep asking the user for an input until it is valid.
+
+      Keyword arguments:
+      prompt -- The message to be printed to the user.
+      other -- Array of other allowed inputs
+      return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
+      """
+      while True:
+        result = input(prompt)
+        if (result == 'q' or result == 'Q'):
+          sys.exit()
+        if result.isdigit():
+          return int(result)  
+        if (result in other):
+          return result
+
     def __init__(self):
         """Initializes the given game into class variable game and starts the main menu."""
         self.menu()
@@ -194,10 +212,23 @@ class CommandLine:
 
         Keyword arguments:
         """
+        print('Its '+ self.identify_piece(self.game.turn) + ' player\'s turn to play')
         while True:
           position = self.input_number('Which piece would you like to move?: ')-1
-          new_position = self.input_number('To what position would you like to move?: ')-1
-          result = self.game.can_move_piece(position, new_position)
+
+          result = self.game.can_move_piece_from(position)
+
+          if (result == Game.CanMoveResults.Ok):
+            valid_moves = self.game.get_valid_moves_from_position(position)
+            str_valid_moves = [str(valid_move+1) for valid_move in valid_moves]
+            query = "To what position would you like to move? (" + ", ".join(str_valid_moves) + " or \"back\"): "
+            new_position = self.input_number_or_other(query, ["b", "B", "back", "Back"])
+            if (isinstance(new_position, int):
+              new_position -= 1
+              result = self.game.can_move_piece(position, new_position)
+            else:
+              continue
+
           if result == Game.CanMoveResults.Ok:
             self.game.move_piece(position, new_position)
             break

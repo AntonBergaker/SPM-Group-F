@@ -223,7 +223,7 @@ class CommandLine:
             str_valid_moves = [str(valid_move+1) for valid_move in valid_moves]
             query = "To what position would you like to move? (" + ", ".join(str_valid_moves) + " or \"back\"): "
             new_position = self.input_number_or_other(query, ["b", "B", "back", "Back"])
-            if (isinstance(new_position, int):
+            if (isinstance(new_position, int)):
               new_position -= 1
               result = self.game.can_move_piece(position, new_position)
             else:

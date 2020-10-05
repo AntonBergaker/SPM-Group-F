@@ -2,6 +2,7 @@ from .game import Game
 from .board import Piece
 import sys
 import os
+import colorama
 
 # Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
 def clear_screen():
@@ -31,6 +32,7 @@ class CommandLine:
         """Initializes the given game into class variable game and starts the main menu."""
         self.game = game
         self.menu()
+        colorama.init()
 
     def print_board(self):
       """Prints the board and the pieces on the board. It also prints how many pieces each player has.
@@ -39,51 +41,83 @@ class CommandLine:
         return -- Prints out the board.
       """
       board = [""] * 24
+
+      reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
+      black_piece = colorama.Fore.MAGENTA +'B' + reset_code
+      white_piece = colorama.Style.BRIGHT + 'W' + reset_code
+
       for x in range(24):
         if (self.game.board[x] == Piece.Empty):
           board[x] = ' '
         elif (self.game.board[x] == Piece.Black):
-          board[x] = 'B'
+          board[x] = black_piece
         else:
-          board[x] = 'W'
+          board[x] = white_piece
+
 
       clear_screen()
-      print(" 1                            2                             3")
-      print("  "+board[0]+"-----------------------------"+board[1]+"-----------------------------"+board[2])
-      print("  |\\                            |                           / |")
-      print("  |  \\                          |                         /   |")
-      print("  |    \\                        |                       /     |")
-      print("  |      \\ 4                  5 |                   6 /       |")
-      print("  |        "+board[3]+"--------------------"+board[4]+"--------------------"+board[5]+"        |")
-      print("  |        | \\                  |                 /  |        |")
-      print("  |        |   \\                |               /    |        |")
-      print("  |        |     \\              |             /      |        |")
-      print("  |        |       \\ 7        8 |         9 /        |        |")
-      print("  |        |         "+board[6]+"----------"+board[7]+"----------"+board[8]+"         |        |")
-      print("  |        |         |                     |         |        |")
-      print("  |        |         |                     |         |        |")
-      print("10|     11 |      12 |                  13 |      14 |     15 |")
-      print("  "+board[9]+"--------"+board[10]+"---------"+board[11]+"                     "+board[12]+"---------"+board[13]+"--------"+board[14])
-      print("  |        |         |                     |         |        |")
-      print("  |        |      16 |         17       18 |         |        |")
-      print("  |        |         "+board[15]+"----------"+board[16]+"----------"+board[17]+"         |        |")
-      print("  |        |       /            |            \\       |        |")
-      print("  |        |     /              |              \\     |        |")
-      print("  |        |   /                |                \\   |        |")
-      print("  |     19 | /               20 |                  \\ | 21     |")
-      print("  |        "+board[18]+"--------------------"+board[19]+"--------------------"+board[20]+"        |")
-      print("  |      /                      |                      \\      |")
-      print("  |    /                        |                        \\    |")
-      print("  |  /                          |                          \\  |")
-      print("22|/                         23 |                          24\\|")
-      print("  "+board[21]+"-----------------------------"+board[22]+"-----------------------------"+board[23]+"  ")
+
+
+      board_text = """ 
+1                            2                             3
+  A-----------------------------C-----------------------------D
+  |)                            |                           / |
+  |  )                          |                         /   |
+  |    )                        |                       /     |
+  |      ) 4                  5 |                   6 /       |
+  |        E--------------------F--------------------G        |
+  |        | )                  |                 /  |        |
+  |        |   )                |               /    |        |
+  |        |     )              |             /      |        |
+  |        |       ) 7        8 |         9 /        |        |
+  |        |         H----------I----------J         |        |
+  |        |         |                     |         |        |
+  |        |         |                     |         |        |
+10|     11 |      12 |                  13 |      14 |     15 |
+  K--------L---------M                     N---------O--------P
+  |        |         |                     |         |        |
+  |        |      16 |         17       18 |         |        |
+  |        |         Q----------R----------S         |        |
+  |        |       /            |            )       |        |
+  |        |     /              |              )     |        |
+  |        |   /                |                )   |        |
+  |     19 | /               20 |                  ) | 21     |
+  |        T--------------------U--------------------V        |
+  |      /                      |                      )      |
+  |    /                        |                        )    |
+  |  /                          |                          )  |
+22|/                         23 |                          24)|
+  X-----------------------------Y-----------------------------Z  """
+
+      # So the preview looks nice, use ] instead of \\ to make the size match
+      board_text = board_text.replace(")", "\\")
+
+      # replace characters with board pieces
+      board_positions = "ACDEFGHIJKLMNOPQRSTUVXYZ"
+
+      # replace in two steps, because color codes include characters that might be replaced otherwise
+      for i in range(24):
+        board_text = board_text.replace(board_positions[i], "pos_" + board_positions[i])
+
+      # replace numbers, also in two steps...
+      for i in range(10):
+        board_text = board_text.replace(str(i), "num_" + str(i))
+
+      for i in range(24):
+        board_text = board_text.replace("pos_" + board_positions[i], board[i])
+
+      for i in range(10):
+        board_text = board_text.replace("num_" + str(i), colorama.Fore.YELLOW + str(i) + reset_code)
+
+      print(board_text)
+      
       #if (self.game.state == Game.GameState.Placing):
         #print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
       pieces_presentation = [' '] * 63
       for i in range(self.game.players[0].pieces_amount):
-        pieces_presentation[i] = 'B'
+        pieces_presentation[i] = black_piece
       for i in range(self.game.players[1].pieces_amount):
-        pieces_presentation[62-i] = 'W'
+        pieces_presentation[62-i] = white_piece
       print("".join(pieces_presentation))
 
 

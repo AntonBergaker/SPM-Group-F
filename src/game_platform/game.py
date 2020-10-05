@@ -34,7 +34,7 @@ class Game:
 
     def check_if_piece_won_game(self, piece):
         """"Checks if the given piece has won the game
-        
+
         Keyword arguments:
         piece -- the piece to check
         return -- True if the given piece has won, otherwise False
@@ -52,6 +52,20 @@ class Game:
                         return False
             return True
         return check_if_piece_lost_game(self, self.board.get_other_piece(piece))
+
+    def check_if_mill_is_ok(self, piece, position):
+        """ Checks if the mill counts as a new mill
+
+        Keyword arguments:
+        piece -- the pieces who moved
+        position -- the position the piece moved # TODO:
+        return -- True if the mill counts as a new one
+        """
+        if (Player.turns_since_last_mill < 3 and Player.latest_mill == get_lines_for_position(self, position) ):
+            return False
+        Player.turns_since_last_mill = 0
+        Player.latest_mill = get_lines_for_position(self, position);
+        return True
 
     class PlaceResults:
         Failed = -1
@@ -157,7 +171,7 @@ class Game:
             return self.CanElimateResults.WrongPiece
         if (self.eliminating == False):
             return self.CanElimateResults.WrongState
-        
+
         # If all opponent pieces are three, we can elimate anything
         opponent_piece = self.board.get_other_piece(self.turn)
         all_are_threes = True
@@ -170,9 +184,9 @@ class Game:
         if (all_are_threes == False):
             if (self.board.has_three_at_position(opponent_piece, position)):
                 return self.CanElimateResults.TargetAreThrees
-        
+
         return self.CanElimateResults.Ok
-    
+
 
     class MoveResults:
         Ok = 1
@@ -195,14 +209,14 @@ class Game:
         piece_at_old_position = self.board[position]
         self.board[position] = Piece.Empty
         self.board[new_position] = piece_at_old_position
-        
+
         if (self.board.has_three_at_position(piece_at_old_position, new_position)):
             self.eliminating = True
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
         return self.MoveResults.Ok
-      
+
     class CanMoveResults:
         Ok = 1
         WrongPiece = -1
@@ -210,7 +224,7 @@ class Game:
         OutsideBoard = -3
         NotAdjacent = -4
         NewPositionOccupied = -5,
-        WrongState = -6   
+        WrongState = -6
     def can_move_piece(self, position, new_position, ignore_turn = False):
         """Checks if a piece at a position can be moved to the given position.
         Returns a CanMoveResults containing information about the move.
@@ -237,7 +251,7 @@ class Game:
             return self.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
             return self.CanMoveResults.NewPositionOccupied
-        
+
         moved_piece = self.board[position]
         total_on_board = self.board.pieces_of_type_on_board(moved_piece)
         # If you have three pieces left you're allowed to fly so the adjacent rule doesn't apply

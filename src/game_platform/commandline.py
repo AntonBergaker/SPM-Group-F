@@ -197,9 +197,9 @@ class CommandLine:
 
       if (self.game.eliminating == True):
         self.eliminate()
-      elif self.game.state == Game.GameState.Placing:
+      elif self.game.state == Game.GameStage.Placing:
         self.place()
-      elif self.game.state == Game.GameState.Moving:
+      elif self.game.state == Game.GameStage.Moving:
         self.move()
 
     def menu(self):

@@ -12,10 +12,10 @@ class Game:
     board = Board()
     players = [Player(Piece.Black), Player(Piece.White)]
 
-    class GameState:
+    class GameStage:
         Placing = 1
         Moving = 2
-    state = GameState.Placing
+    state = GameStage.Placing
 
     eliminating = 0
 
@@ -40,7 +40,7 @@ class Game:
         return -- True if the given piece has won, otherwise False
         """
         def check_if_piece_lost_game(self, piece):
-            if (self.state == Game.GameState.Placing):
+            if (self.state == Game.GameStage.Placing):
                 return False
             if (self.board.pieces_of_type_on_board(piece) <= 2):
                 return True
@@ -75,7 +75,7 @@ class Game:
         player.pieces_amount -= 1
 
         if (self.players[0].pieces_amount == 0 and self.players[1].pieces_amount == 0):
-            self.state = self.GameState.Moving
+            self.state = self.GameStage.Moving
 
         if (self.board.has_three_at_position(piece, position)):
             self.eliminating = True

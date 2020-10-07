@@ -8,16 +8,19 @@ class Game:
     Contains the current turn located in the turn variable
     """
 
-    turn = Piece.Black
-    board = Board()
-    players = [Player(Piece.Black), Player(Piece.White)]
-
     class GameStage:
         Placing = 1
         Moving = 2
-    state = GameStage.Placing
 
-    eliminating = 0
+    def __init__(self):
+        """Constructor for Game.
+        Initializes a game with all variables and an empty board where it's blacks turn to play.
+        """
+        self.turn = Piece.Black
+        self.board = Board()
+        self.players = [Player(Piece.Black), Player(Piece.White)]
+        self.state = Game.GameStage.Placing
+        self.eliminating = 0
 
     def get_player_from_piece(self, piece):
         """Gets the player belong to a piece

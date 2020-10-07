@@ -49,7 +49,7 @@ class CommandLine:
     def __init__(self):
         """Initializes the given game into class variable game and starts the main menu."""
         self.menu()
-        colorama.init()
+        colorama.init(True)
 
     def print_board(self):
       """Prints the board and the pieces on the board. It also prints how many pieces each player has.

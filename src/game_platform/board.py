@@ -12,8 +12,6 @@ class Board:
 	Contains a board located in variable board that is filled with 24 empty positions.
 	Contains all mill possibilities located in variable lines.
     """
-	
-    board = [Piece.Empty] * 24
 
     lines = [
         [0, 1, 2],
@@ -37,6 +35,11 @@ class Board:
         [1, 4, 7],
         [16, 19, 22]
     ]
+
+    def __init__(self):
+        """Constructor for Board.
+        Initializes an instance with an empty board."""
+        self.board = [Piece.Empty] * 24
 
     def pieces_of_type_on_board(self, piece):
         """Counts how many of the given piece is on the board.

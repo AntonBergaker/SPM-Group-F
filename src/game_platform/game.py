@@ -215,6 +215,7 @@ class Game:
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
+        Player.turns_since_last_mill += 1
         return self.MoveResults.Ok
 
     class CanMoveResults:

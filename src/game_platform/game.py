@@ -143,6 +143,7 @@ class Game:
             return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 
         return True

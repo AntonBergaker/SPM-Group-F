@@ -64,15 +64,12 @@ class Game:
 
         Keyword arguments:
         piece -- the pieces who moved
-        position -- the position the piece moved # TODO:
+        position -- the position the piece moved
         return -- True if the mill counts as a new one
         """
         player = self.get_player_from_piece(piece)
-        if (self.board.get_lines_for_position(piece)!= 0):
-            player.latest_mill = self.board.get_lines_for_position(piece)
-        if (player.turns_since_last_mill < 3 and player.latest_mill == self.board.get_lines_for_position(position) ):
+        if player.latest_mill[position] < 3:
             return False
-
         return True
 
 
@@ -229,21 +226,24 @@ class Game:
         if (self.can_move_piece(position, new_position) != self.CanMoveResults.Ok):
             return self.MoveResults.Failed
         piece_at_old_position = self.board[position]
+
+        player = self.get_player_from_piece(piece_at_old_position)
+        if (self.board.has_three_at_position(piece_at_old_position, position)):
+            player.latest_mill[position] = 0
+
         self.board[position] = Piece.Empty
         self.board[new_position] = piece_at_old_position
-        player = self.get_player_from_piece(piece_at_old_position)
 
         if (    self.board.has_three_at_position(piece_at_old_position, new_position) and
                 self.check_if_mill_is_ok(piece_at_old_position, new_position)):
 
             self.eliminating = True
-            player.turns_since_last_mill = 0
-            """player.latest_mill = self.board.get_lines_for_position(position)"""
+
 
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
-        player.turns_since_last_mill += 1
+        player.increase_position_move_count()
         self.total_turns = self.total_turns + 1
         return self.MoveResults.Ok
 

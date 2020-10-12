@@ -16,5 +16,11 @@ class Player:
         """
         self.piece = piece
         self.pieces_amount = 12
-        self.latest_mill = Board.lines[0]
-        self.turns_since_last_mill = 0
+        self.latest_mill = [0] * Board.position_count
+
+    def increase_position_move_count(self):
+        """
+        Senare kommentarer
+        """
+        for position in range(Board.position_count):
+            self.latest_mill[position] += 1

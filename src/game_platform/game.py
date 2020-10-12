@@ -43,6 +43,13 @@ class Game:
         BlackWon = 3
         WhiteWon = 4
     def get_game_winner(self):
+        """Gets a WinnerResults if there is one with the winner of the game, if there is one.
+        Returns GameInProgress if the game is currently being played.
+        Returns Tie if the game ended in a draw.
+        Returns BlackWon if black won the game.
+        Returns WhiteWon if white won the game.
+        return -- WinnerResults with the game win state
+        """
         if (self.check_if_tie()):
             return Game.WinnerResults.Tie
         if (self.check_if_piece_won_game(Piece.Black)):

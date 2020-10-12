@@ -68,7 +68,7 @@ class Game:
         return -- True if the mill counts as a new one
         """
         player = self.get_player_from_piece(piece)
-        if player.latest_mill[position] < 2:
+        if player.latest_mill[position] < 3:
             return False
         return True
 
@@ -231,7 +231,7 @@ class Game:
         if (self.board.has_three_at_position(piece_at_old_position, position)):
             player.latest_mill[position] = 0
 
-        self.total_turns = self.total_turns + 1
+        player.increase_position_move_count()
         self.board[position] = Piece.Empty
         self.board[new_position] = piece_at_old_position
 
@@ -245,7 +245,7 @@ class Game:
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
-        player.increase_position_move_count()
+        self.total_turns = self.total_turns + 1
         return self.MoveResults.Ok
 
     class CanMoveResults:

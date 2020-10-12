@@ -302,6 +302,10 @@ class CommandLine:
                 self.print_board()
                 print("White has won the game")
                 break
+              if (self.game.check_if_tie()):
+                self.print_board()
+                print("It's a draw! Max amount of turns is 200")
+                break
           elif user_input_again =='2':
             print('This is where we play against the AI')
             #remove these when we add stuff

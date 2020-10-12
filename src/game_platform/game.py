@@ -4,8 +4,9 @@ from .player import Player
 class Game:
     """A representation of the game and its rules.
     Contains a board located in the board variable.
-    Contains players located in an array inside the players variable
-    Contains the current turn located in the turn variable
+    Contains players located in an array inside the players variable.
+    Contains the current turn located in the turn variable.
+    Contains the total amount of turns that has been played in the game in the total_turns variable.
     """
 
     class GameStage:
@@ -21,6 +22,7 @@ class Game:
         self.players = [Player(Piece.Black), Player(Piece.White)]
         self.state = Game.GameStage.Placing
         self.eliminating = 0
+        self.total_turns = 0
 
     def get_player_from_piece(self, piece):
         """Gets the player belong to a piece
@@ -56,6 +58,16 @@ class Game:
             return True
         return check_if_piece_lost_game(self, self.board.get_other_piece(piece))
 
+    def check_if_tie(self):
+        """"Checks if the total amount of turns has exceeded 200 turns which ends the game in a tie.
+        
+        Keyword arguments:
+        return -- True if the game is a tie, otherwise False.
+        """
+        if(self.total_turns < 200):
+            return False
+        else: return True
+
     class PlaceResults:
         Failed = -1
         Placed = 1
@@ -64,7 +76,7 @@ class Game:
         """Places a piece at the given location.
         If the placement was invalid it will return PlaceResults.Failed.
         If the placement resulted in a three it will return PlaceResults.GotThree.
-        Otherwise it will return PlaceResults.Placed.
+        Otherwise it will return PlaceResults.Placed and increase total_turns by 1.
 
         Keyword arguments:
         piece -- the piece to place
@@ -84,6 +96,7 @@ class Game:
             self.eliminating = True
             return self.PlaceResults.GotThree
         self.turn = self.board.get_other_piece(self.turn)
+        self.total_turns = self.total_turns + 1
         return self.PlaceResults.Placed
 
     class CanPlaceResults:
@@ -130,6 +143,7 @@ class Game:
             return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 
         return True
@@ -184,7 +198,7 @@ class Game:
     def move_piece(self, position, new_position):
         """Moves a piece from a position to another.
         Returns a MoveResults containing information about the move.
-        Returns Ok if the move was successful.
+        Returns Ok if the move was successful and increase total_turns by 1.
         Returns GotThree if the resulting move resulted in threes.
         Returns Failed if the move was invalid.
 
@@ -204,6 +218,7 @@ class Game:
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
+        self.total_turns = self.total_turns + 1
         return self.MoveResults.Ok
 
     class CanMoveResults:

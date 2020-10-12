@@ -157,6 +157,7 @@ class CommandLine:
         Keyword arguments:
       """
         self.print_board()
+        self.info()
         print(self.identify_piece(self.game.turn) + ' player has three in a row!')
 
         while True:

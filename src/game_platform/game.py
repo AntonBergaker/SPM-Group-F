@@ -68,12 +68,15 @@ class Game:
         return -- True if the mill counts as a new one
         """
         player = self.get_player_from_piece(piece)
-
+        if (self.board.get_lines_for_position(piece)!= 0):
+            player.latest_mill = self.board.get_lines_for_position(piece)
         if (player.turns_since_last_mill < 3 and player.latest_mill == self.board.get_lines_for_position(position) ):
             return False
 
         return True
-            def check_if_tie(self):
+
+
+    def check_if_tie(self):
         """"Checks if the total amount of turns has exceeded 200 turns which ends the game in a tie.
 
         Keyword arguments:
@@ -235,7 +238,7 @@ class Game:
 
             self.eliminating = True
             player.turns_since_last_mill = 0
-            player.latest_mill = self.board.get_lines_for_position(position)
+            """player.latest_mill = self.board.get_lines_for_position(position)"""
 
             return self.MoveResults.GotThree
 

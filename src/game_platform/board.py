@@ -2,7 +2,7 @@ class Piece:
     """A representation of the color of the pieces.
 	A piece is Empty if it has not been assigned a color yet. Otherwise it is Black or White.
     """
-	
+
     Empty = 0
     Black = 1
     White = 2
@@ -36,10 +36,12 @@ class Board:
         [16, 19, 22]
     ]
 
+    position_count = 24
+
     def __init__(self):
         """Constructor for Board.
         Initializes an instance with an empty board."""
-        self.board = [Piece.Empty] * 24
+        self.board = [Piece.Empty] * self.position_count
 
     def pieces_of_type_on_board(self, piece):
         """Counts how many of the given piece is on the board.
@@ -70,7 +72,7 @@ class Board:
             if (other_position in line):
                 if (abs(line.index(position) - line.index(other_position)) == 1):
                     return True
-        
+
         return False
 
     def get_lines_for_position(self, position):
@@ -92,7 +94,7 @@ class Board:
 
     def has_three_at_position(self, piece, position):
         """Checks wether the given piece on the given position is in a mill.
-		
+
         Keyword arguments:
         piece -- The piece to check if it is in a mill.
         position -- The position to look for in possible mills.

@@ -19,8 +19,9 @@ class Player:
         self.latest_mill = [0] * Board.position_count
 
     def increase_position_move_count(self):
-        """
-        Senare kommentarer
+        """ Increases the position move count on every positions on the board
+
+        return -- nothing
         """
         for position in range(Board.position_count):
             self.latest_mill[position] += 1

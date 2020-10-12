@@ -37,6 +37,21 @@ class Game:
             return self.players[1]
         return None
 
+    class WinnerResults:
+        GameInProgress = 1
+        Tie = 2
+        BlackWon = 3
+        WhiteWon = 4
+    def get_game_winner(self):
+        if (self.check_if_tie()):
+            return Game.WinnerResults.Tie
+        if (self.check_if_piece_won_game(Piece.Black)):
+            return Game.WinnerResults.BlackWon
+        if (self.check_if_piece_won_game(Piece.White)):
+            return Game.WinnerResults.WhiteWon
+        
+        return Game.WinnerResults.GameInProgress
+
     def check_if_piece_won_game(self, piece):
         """"Checks if the given piece has won the game
         
@@ -46,6 +61,9 @@ class Game:
         """
         def check_if_piece_lost_game(self, piece):
             if (self.state == Game.GameStage.Placing):
+                return False
+            # Cant lose if it's the others piece's turn
+            if (self.turn != piece):
                 return False
             if (self.board.pieces_of_type_on_board(piece) <= 2):
                 return True

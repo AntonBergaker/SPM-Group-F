@@ -7,7 +7,7 @@ class Player:
 	Contains the amount of pieces the player has at the beginning located in variable pieces_amount.
     """
 
-    def __init__(self, piece):
+    def __init__(self, piece, piece_count):
         """Initiates the Player's piece as the given piece.
 
         Keyword arguments:
@@ -15,7 +15,7 @@ class Player:
         return -- Returns nothing. Initiates the Player's piece as the given piece.
         """
         self.piece = piece
-        self.pieces_amount = 12
+        self.pieces_amount = piece_count
         self.latest_mill = [0] * Board.position_count
 
     def increase_position_move_count(self):

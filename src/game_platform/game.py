@@ -6,7 +6,7 @@ class Game:
     Contains a board located in the board variable.
     Contains players located in an array inside the players variable.
     Contains the current turn located in the turn variable.
-    Contains the total amoun of turns that has been played in the game in the total_turns variable.
+    Contains the total amount of turns that has been played in the game in the total_turns variable.
     """
 
     class GameStage:

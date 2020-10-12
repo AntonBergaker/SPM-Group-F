@@ -294,15 +294,17 @@ class CommandLine:
               self.print_board()
               self.play()
 
-              if (self.game.check_if_piece_won_game(Piece.Black)):
+              result = self.game.get_game_winner()
+
+              if (result == Game.WinnerResults.BlackWon):
                 self.print_board()
                 print("Black has won the game")
                 break
-              if (self.game.check_if_piece_won_game(Piece.White)):
+              if (result == Game.WinnerResults.WhiteWon):
                 self.print_board()
                 print("White has won the game")
                 break
-              if (self.game.check_if_tie()):
+              if (result == Game.WinnerResults.Tie):
                 self.print_board()
                 print("It's a draw! Max amount of turns is 200")
                 break

@@ -31,7 +31,7 @@ class TestGame(unittest.TestCase):
         game.place_piece(game.turn, 18)
         game.place_piece(game.turn, 19)
 
-        self.assertEquals(Game.GameStage.Moving, game.state)
+        self.assertEqual(Game.GameStage.Moving, game.state)
 
         # Moves black down
         game.move_piece(0, 3)
@@ -42,7 +42,7 @@ class TestGame(unittest.TestCase):
         # Move black back
         game.move_piece(3, 0)
 
-        self.assertEquals(False, game.eliminating)
+        self.assertEqual(False, game.eliminating)
 
         # Waste 2 turns
         game.move_piece(20, 19)
@@ -52,7 +52,7 @@ class TestGame(unittest.TestCase):
         game.move_piece(20, 19)
         
         game.move_piece(3, 0)
-        self.assertEquals(True, game.eliminating)
+        self.assertEqual(True, game.eliminating)
 
 if __name__ == '__main__':
     unittest.main()

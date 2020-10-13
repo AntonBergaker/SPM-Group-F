@@ -13,13 +13,13 @@ class Game:
         Placing = 1
         Moving = 2
 
-    def __init__(self):
+    def __init__(self, player_piece_count = 12):
         """Constructor for Game.
         Initializes a game with all variables and an empty board where it's blacks turn to play.
         """
         self.turn = Piece.Black
         self.board = Board()
-        self.players = [Player(Piece.Black), Player(Piece.White)]
+        self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
         self.eliminating = 0
         self.total_turns = 0
@@ -74,10 +74,10 @@ class Game:
                 return False
             if (self.board.pieces_of_type_on_board(piece) <= 2):
                 return True
-            for position in range(24):
+            for position in range(Board.position_count):
                 if (self.board[position] != piece):
                     continue
-                for new_position in range(24):
+                for new_position in range(Board.position_count):
                     if (self.can_move_piece(position, new_position, True) == Game.CanMoveResults.Ok):
                         return False
             return True
@@ -161,7 +161,7 @@ class Game:
         position -- position on the board where the piece will be placed
         return -- A CanPlaceResults result
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return self.CanPlaceResults.OutsideBoard
         if (self.turn != piece):
             return self.CanPlaceResults.WrongPiece
@@ -207,7 +207,7 @@ class Game:
         Keyword arguments:
         position -- The position to check
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return self.CanElimateResults.OutsideBoard
         if (self.board[position] == Piece.Empty):
             return self.CanElimateResults.NoPiece
@@ -256,8 +256,10 @@ class Game:
         if (self.board.has_three_at_position(piece_at_old_position, position)):
             player.latest_mill[position] = 0
 
+        player.increase_position_move_count()
         self.board[position] = Piece.Empty
         self.board[new_position] = piece_at_old_position
+
 
         if (    self.board.has_three_at_position(piece_at_old_position, new_position) and
                 self.check_if_mill_is_ok(piece_at_old_position, new_position)):
@@ -268,7 +270,6 @@ class Game:
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
-        player.increase_position_move_count()
         self.total_turns = self.total_turns + 1
         return self.MoveResults.Ok
 
@@ -293,7 +294,7 @@ class Game:
         ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
         return -- a CanMoveResult result that shows how to implement
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return Game.CanMoveResults.OutsideBoard
         if (ignore_turn == False and self.turn != self.board[position]):
             return Game.CanMoveResults.WrongPiece
@@ -325,7 +326,7 @@ class Game:
         if (can_move_from_result != Game.CanMoveResults.Ok):
             return can_move_from_result
 
-        if (new_position < 0 or new_position > 23):
+        if (new_position < 0 or new_position > Board.position_count):
             return self.CanMoveResults.OutsideBoard
         if (position == new_position):
             return self.CanMoveResults.SamePosition
@@ -351,7 +352,7 @@ class Game:
         return -- a list of positions we can move
         """
         valid_moves = []
-        for i in range(24):
+        for i in range(Board.position_count):
             if (self.can_move_piece(position, i, ignore_turn) == Game.CanMoveResults.Ok):
                 valid_moves.append(i)
         return valid_moves

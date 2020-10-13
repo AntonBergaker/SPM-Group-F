@@ -95,5 +95,42 @@ class TestGame(unittest.TestCase):
 
         self.assertEqual(Game.WinnerResults.Tie, game.get_game_winner())
 
+
+    def test_mill_wait(self):
+        game = Game(4)
+
+        game.place_piece(game.turn, 0)
+        game.place_piece(game.turn, 21)
+        game.place_piece(game.turn, 1)
+        game.place_piece(game.turn, 22)
+        game.place_piece(game.turn, 2)
+        game.eliminate_piece(22)
+        game.place_piece(game.turn, 22)
+        game.place_piece(game.turn, 18)
+        game.place_piece(game.turn, 19)
+
+        self.assertEqual(Game.GameStage.Moving, game.state)
+
+        # Moves black down
+        game.move_piece(0, 3)
+
+        # Waste a turn on white
+        game.move_piece(19, 20)
+
+        # Move black back
+        game.move_piece(3, 0)
+
+        self.assertEqual(False, game.eliminating)
+
+        # Waste 2 turns
+        game.move_piece(20, 19)
+        game.move_piece(0, 3)
+        game.move_piece(19, 20)
+        game.move_piece(18, 10)
+        game.move_piece(20, 19)
+        
+        game.move_piece(3, 0)
+        self.assertEqual(True, game.eliminating)
+
 if __name__ == '__main__':
     unittest.main()

@@ -265,6 +265,14 @@ class CommandLine:
             self.move()
 
     def quit(self):
+        """"
+        Gives the user 3 options when quit() is being called in terminal by input [q] or [Q]. The user can quit the
+        session by heading back to main menu with inout [M] or [m], quit the complete game in terminal with input
+        [q] or [Q] or cancel and head back to the session the user was on before calling for quit by cancelling with
+        input [c] or [C].
+
+        Keyword arguments:
+        """
         alternatives = ["M", "m", "Q", "q", "C", "c"]
         while True:
             user_input = input("To quit the game insert [Q], to get back to main menu [M] or cancel [C]: ")
@@ -283,6 +291,12 @@ class CommandLine:
             return
 
     def quit_in_main_menu(self):
+        """"
+        Gives the user 2 options when they want to quit the game from the main menu. Quit the complete game in terminal
+        with input [q] or [Q] or cancel and head back to the main menu with input [c] or [C].
+
+        Keyword arguments:
+        """
         alternatives = ["Q", "q", "C", "c"]
         while True:
             user_input = input("To quit the game insert [Q] or cancel [C]: ")
@@ -298,8 +312,12 @@ class CommandLine:
             self.menu()
 
     def info(self):
+        """"
+        Static print information under the game board to inform the user how to quit the game.
+        """
+        padding = 25
         reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
-        print(colorama.Fore.YELLOW + '                         To quit input [Q]' + reset_code)
+        print(" "*padding + colorama.Fore.YELLOW + "To quit input [Q]" + reset_code)
 
     def menu(self):
         """Prints out the menu and gets the user's input.
@@ -313,6 +331,7 @@ class CommandLine:
         clear_screen()
         while True:
             print('### UU-GAME ###')
+            print("### You can at all times quit the game by inputting [Q] ###")
             print('1. Play Local')
             print('2. Play Online')
             print('3. How to play')

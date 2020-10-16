@@ -127,13 +127,6 @@ class CommandLine:
         board_text = board_text.replace("num_" + str(i), colorama.Fore.YELLOW + str(i) + reset_code)
 
       print(board_text)
-      print("Black " + str(self.game.players[0].latest_mill))
-      print("White " + str(self.game.players[1].latest_mill))
-      print("Black latest mill: " + str(self.game.players[0].latest_created_mill))
-      print("White latest mill: " + str(self.game.players[1].latest_created_mill))
-      print("Turn: "+ str(self.game.total_turns))
-      print("Black From: " + str(self.game.players[0].latest_move_from +1) + " To: " + str(self.game.players[0].latest_move_to +1))
-      print("White From: " + str(self.game.players[1].latest_move_from +1) + " To: " + str(self.game.players[1].latest_move_to +1))
       
       #if (self.game.state == Game.GameState.Placing):
         #print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))

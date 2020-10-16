@@ -336,9 +336,8 @@ class Game:
             return self.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
             return self.CanMoveResults.NewPositionOccupied
+
         player = self.get_player_from_piece(self.turn)
-        print("Result: " + str(position in player.latest_created_mill))
-        
         if (player.latest_move_to == position and player.latest_move_from == new_position and
             (position in player.latest_created_mill) == True):
             return self.CanMoveResults.RecreateBrokenMill

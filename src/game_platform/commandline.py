@@ -22,7 +22,7 @@ class CommandLine:
         Keyword arguments:
         prompt -- The message to be printed to the user.
         return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
-      """
+        """
         while True:
             result = input(prompt)
             if (result == 'q' or result == 'Q'):
@@ -32,13 +32,13 @@ class CommandLine:
 
     def input_number_or_other(self, prompt, other):
         """Checks if the user's given input is an integer or inside other. If the user's input is q or Q the program will exit.
-      It will keep asking the user for an input until it is valid.
+        It will keep asking the user for an input until it is valid.
 
-      Keyword arguments:
-      prompt -- The message to be printed to the user.
-      other -- Array of other allowed inputs
-      return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
-      """
+        Keyword arguments:
+        prompt -- The message to be printed to the user.
+        other -- Array of other allowed inputs
+        return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
+        """
         while True:
             result = input(prompt)
             if (result == 'q' or result == 'Q'):
@@ -58,7 +58,7 @@ class CommandLine:
 
         Keyword arguments:
         return -- Prints out the board.
-      """
+        """
         board = [""] * 24
 
         reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
@@ -255,7 +255,7 @@ class CommandLine:
 
         Keyword arguments:
         return -- Prints out different messages depending on the user's input and updates the board accordingly.
-      """
+        """
 
         if (self.game.eliminating == True):
             self.eliminate()
@@ -378,24 +378,24 @@ class CommandLine:
                 self.game = Game()
                 self.print_board()
                 howto_text = f"""
-          This is preview of the board.
-          Black players pieces are denoted by {colorama.Fore.MAGENTA}B{colorama.Style.RESET_ALL} and white players pieces are denoted by {colorama.Style.BRIGHT}W{colorama.Style.RESET_ALL}.
-          The pieces you have not placed yet are represented below the board.
+This is preview of the board.
+Black players pieces are denoted by {colorama.Fore.MAGENTA}B{colorama.Style.RESET_ALL} and white players pieces are denoted by {colorama.Style.BRIGHT}W{colorama.Style.RESET_ALL}.
+The pieces you have not placed yet are represented below the board.
 
-          * Both players in the game will have twelve pieces each and have twenty four places to place on the board.
-          * The player who starts first will always be black.
-          * The board starts empty and each player will have to place their pieces on the board taking turns.
-          * You can take your opponents piece out of the board if you have a three in a row.
-          * Three in a row can be done horizontally, vertically or even diagonally.
-          * Once all the pieces are placed on the board, each player can move their pieces to adjacent empty places along the lines.
-          * When a player has three pieces left on the board, the player can move their pieces to any empty place on the board.
+* Both players in the game will have twelve pieces each and have twenty four places to place on the board.
+* The player who starts first will always be black.
+* The board starts empty and each player will have to place their pieces on the board taking turns.
+* You can take your opponents piece out of the board if you have a three in a row.
+* Three in a row can be done horizontally, vertically or even diagonally.
+* Once all the pieces are placed on the board, each player can move their pieces to adjacent empty places along the lines.
+* When a player has three pieces left on the board, the player can move their pieces to any empty place on the board.
 
-          A player will win the game if you satisfy any of these two conditions
-          1. When their opponent’s pieces are reduced to less than three.
-          2. If you can surround your opponent’s pieces making them unable to move or match three in a row.
+A player will win the game if you satisfy any of these two conditions
+1. When their opponent’s pieces are reduced to less than three.
+2. If you can surround your opponent’s pieces making them unable to move or match three in a row.
 
-          The game will end in a draw when the total amount of turns reaches 200.
-          """
+The game will end in a draw when the total amount of turns reaches 200.
+"""
                 print(howto_text)
                 menu_input = input('<- Back to main menu, input 1 and press enter: ')
                 if menu_input == '1':

@@ -127,6 +127,13 @@ class CommandLine:
         board_text = board_text.replace("num_" + str(i), colorama.Fore.YELLOW + str(i) + reset_code)
 
       print(board_text)
+      print("Black " + str(self.game.players[0].latest_mill))
+      print("White " + str(self.game.players[1].latest_mill))
+      print("Black latest mill: " + str(self.game.players[0].latest_created_mill))
+      print("White latest mill: " + str(self.game.players[1].latest_created_mill))
+      print("Turn: "+ str(self.game.total_turns))
+      print("Black From: " + str(self.game.players[0].latest_move_from +1) + " To: " + str(self.game.players[0].latest_move_to +1))
+      print("White From: " + str(self.game.players[1].latest_move_from +1) + " To: " + str(self.game.players[1].latest_move_to +1))
       
       #if (self.game.state == Game.GameState.Placing):
         #print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
@@ -240,6 +247,8 @@ class CommandLine:
             print("The positions are not nearby.")
           elif result == Game.CanMoveResults.NewPositionOccupied:
             print("The new position is occupied.")
+          elif result == Game.CanMoveResults.RecreateBrokenMill:
+            print("Can't move back the piece to recreate the mill that broke it in the previous turn.")
           elif result == Game.CanMoveResults.WrongState:
             print("Moving pieces are not allowed at this time (this shouldn't be possible to happen).")
             return # Safety return here. Wrong state means no moving can happen

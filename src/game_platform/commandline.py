@@ -1,5 +1,8 @@
 from .game import Game
 from .board import Piece
+from game_engine import run_AI
+from game_engine import saveGame
+import json
 import sys
 import os
 import colorama
@@ -310,9 +313,10 @@ class CommandLine:
                 break
           elif user_input_again =='2':
             print('This is where we play against the AI')
-            #remove these when we add stuff
-            menu_input = input('<- Back to main menu, input 1 and press enter: ')
-            if menu_input == '1':
+            user_input = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+            run_AI.run_AI(user_input, saveGame)
+            menu_input = input('<- Back to main menu, input 3 and press enter: ')
+            if menu_input == '3':
               clear_screen()
         elif user_input == '2':
           print('This is where we play Online')

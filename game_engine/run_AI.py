@@ -5,7 +5,7 @@ from AI import run_game_easy
 from saveGame import load_save_file
 import sys
 
-def run_AI(difficulty): #Add second argument here with the current gamestate
+def run_AI(difficulty, game_state): #Add second argument here with the current gamestate
     data = load_save_file()
     if(int(difficulty) == 0):
         response = run_game_easy(data)

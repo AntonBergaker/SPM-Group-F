@@ -252,6 +252,8 @@ class CommandLine:
         result = self.game.can_eliminate_piece(position)
         if result == Game.CanElimateResults.Ok:
           self.game.eliminate_piece(position)
+          player = self.game.get_player_from_piece(self.game.turn)
+          player.previous_move[2] = position
           break
         elif result == Game.CanElimateResults.NoPiece:
           print("No piece at that position.")
@@ -264,6 +266,9 @@ class CommandLine:
         else:
           print("Something went wrong")
 
+    def ai_eliminate(self, eliminate_position):
+        position = eliminate_position -1
+        self.game.eliminate_piece(position)
 
     def place(self):
         """Ask the user for input on where to place, and then places there.
@@ -278,6 +283,8 @@ class CommandLine:
           result = self.game.can_place_piece(self.game.turn, position)
           if result == Game.CanPlaceResults.Ok:
             self.game.place_piece(self.game.turn, position)
+            player = self.game.get_player_from_piece(self.game.turn)
+            player.previous_move[1] = position
             break
           elif result == Game.CanPlaceResults.Occupied:
             print("There is already something at this position.")
@@ -290,6 +297,12 @@ class CommandLine:
             print("Position is outside the board.")
           else:
             print("Something went wrong.")
+
+    def ai_place(self, ai_position):
+        while True:
+            position = ai_position - 1
+            result = self.game.can_place_piece(self.game.turn, position)
+            break
 
     def move(self):
         """Gets the user's input on where to move.
@@ -316,6 +329,9 @@ class CommandLine:
 
           if result == Game.CanMoveResults.Ok:
             self.game.move_piece(position, new_position)
+            player = self.game.get_player_from_piece(self.game.turn)
+            player.previous_move[0] = position
+            player.previous_move[1] = new_position
             break
           elif result == Game.CanMoveResults.WrongPiece:
             print("Can't move opponents/empty piece.")
@@ -332,6 +348,11 @@ class CommandLine:
             return # Safety return here. Wrong state means no moving can happen
           else:
             print("Something went wrong.")
+
+    def ai_move(self, ai_position_from, ai_position_to):
+        old_position = ai_position_from -1
+        new_position = ai_position_to -1
+        self.game.move_piece(old_position, new_position)
 
     def play(self):
       """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
@@ -351,6 +372,18 @@ class CommandLine:
         self.place()
       elif self.game.state == Game.GameStage.Moving:
         self.move()
+
+    def ai_play(self):
+        if (self.game.eliminating == True):
+            wants_to_eliminate = self.ai_wants_to_eliminate()
+            self.ai_eliminate(wants_to_eliminate)
+        elif self.game.state == Game.GameStage.Placing:
+            ai_place = self.ai_moves_to()
+            self.ai_place(ai_place)
+        elif self.game.state == Game.GameStage.Moving:
+            ai_place = self.ai_moves_to()
+            ai_move = self.ai_moves_from()
+            self.ai_move(ai_move, ai_place)
 
     def translator(self, position):
         if position == 'a1':
@@ -451,13 +484,25 @@ class CommandLine:
         if position == '2':
             return 'g7'
 
-    def read_from_save_file(self):
+    def ai_moves_to(self):
         data = None
         ai_move = None
         with open('save_file.json', "r") as f:
             data = json.load(f)
             ai_move = data["data"]["ai_previous_move"][1]
-            print(ai_move)
+            return ai_move
+
+    def ai_moves_from(self):
+        data = None
+        ai_move = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            ai_move = data["data"]["ai_previous_move"][0]
+            return ai_move
+
+    def ai_wants_to_eliminate(self):
+        # TODO
+        return
 
     def write_to_save_file(self, position):
         data = None
@@ -469,8 +514,33 @@ class CommandLine:
             json.dump(data, f)
 
     def play_against_AI(self, difficulty):
+        # Delete save_file
+        # Create save_file
+        # While loop that checks how long we play
+        # Player as Input -> Translate Input -> Save in save_file
+        # AI plays -> Read save_file -> Translate output -> Send it in as Player 2
+        # If phase 1 call moves_to and check if eliminate
+        # If phase 2 call ai_moves_from
         manage_game.delete_game_file()
         manage_game.create_game_file()
+        while (True):
+            self.print_board()
+            self.play()
+            result = self.game.get_game_winner()
+
+            if (result == Game.WinnerResults.BlackWon):
+                self.print_board()
+                print("Black has won the game")
+                break
+            if (result == Game.WinnerResults.WhiteWon):
+                self.print_board()
+                print("White has won the game")
+                break
+            if (result == Game.WinnerResults.Tie):
+                self.print_board()
+                print("It's a draw! Max amount of turns is 200")
+                break
+
         self.read_from_save_file()
         run_AI(difficulty)
 

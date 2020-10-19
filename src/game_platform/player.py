@@ -17,6 +17,7 @@ class Player:
         self.piece = piece
         self.pieces_amount = piece_count
         self.latest_mill = [0] * Board.position_count
+        self.previous_move = [0]*3
 
     def increase_position_move_count(self):
         """ Increases the position move count on every positions on the board

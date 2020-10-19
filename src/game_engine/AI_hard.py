@@ -1,5 +1,5 @@
-from classes import * 
-from saveGame import *
+from .classes import *
+from .saveGame import *
 from random import choice
 from copy import deepcopy
 from math import inf

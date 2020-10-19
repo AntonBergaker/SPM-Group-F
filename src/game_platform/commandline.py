@@ -1,13 +1,13 @@
 from .game import Game
 from .board import Piece
-from game_engine import run_AI
-from game_engine import saveGame
+from game_engine import *
+
 import json
 import sys
 import os
 import colorama
 
-# Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
+
 def clear_screen():
     """Clears the terminal."""
     os.system('cls' if os.name=='nt' else 'clear')
@@ -140,6 +140,90 @@ class CommandLine:
         pieces_presentation[62-i] = white_piece
       print("".join(pieces_presentation))
 
+      def print_board_ai(self):
+          """Prints the board and the pieces on the board. It also prints how many pieces each player has.
+
+            Keyword arguments:
+            return -- Prints out the board.
+          """
+          board = [""] * 24
+
+          reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
+          black_piece = colorama.Fore.MAGENTA + 'B' + reset_code
+          white_piece = colorama.Style.BRIGHT + 'W' + reset_code
+
+          for x in range(24):
+              if (self.game.board[x] == Piece.Empty):
+                  board[x] = ' '
+              elif (self.game.board[x] == Piece.Black):
+                  board[x] = black_piece
+              else:
+                  board[x] = white_piece
+
+          clear_screen()
+
+          board_text = """ 
+    1                            2                             3
+      A-----------------------------C-----------------------------D
+      |)                            |                           / |
+      |  )                          |                         /   |
+      |    )                        |                       /     |
+      |      ) 4                  5 |                   6 /       |
+      |        E--------------------F--------------------G        |
+      |        | )                  |                 /  |        |
+      |        |   )                |               /    |        |
+      |        |     )              |             /      |        |
+      |        |       ) 7        8 |         9 /        |        |
+      |        |         H----------I----------J         |        |
+      |        |         |                     |         |        |
+      |        |         |                     |         |        |
+    10|     11 |      12 |                  13 |      14 |     15 |
+      K--------L---------M                     N---------O--------P
+      |        |         |                     |         |        |
+      |        |      16 |         17       18 |         |        |
+      |        |         Q----------R----------S         |        |
+      |        |       /            |            )       |        |
+      |        |     /              |              )     |        |
+      |        |   /                |                )   |        |
+      |     19 | /               20 |                  ) | 21     |
+      |        T--------------------U--------------------V        |
+      |      /                      |                      )      |
+      |    /                        |                        )    |
+      |  /                          |                          )  |
+    22|/                         23 |                          24)|
+      X-----------------------------Y-----------------------------Z  """
+
+          # So the preview looks nice, use ] instead of \\ to make the size match
+          board_text = board_text.replace(")", "\\")
+
+          # replace characters with board pieces
+          board_positions = "ACDEFGHIJKLMNOPQRSTUVXYZ"
+
+          # replace in two steps, because color codes include characters that might be replaced otherwise
+          for i in range(24):
+              board_text = board_text.replace(board_positions[i], "pos_" + board_positions[i])
+
+          # replace numbers, also in two steps...
+          for i in range(10):
+              board_text = board_text.replace(str(i), "num_" + str(i))
+
+          for i in range(24):
+              board_text = board_text.replace("pos_" + board_positions[i], board[i])
+
+          for i in range(10):
+              board_text = board_text.replace("num_" + str(i), colorama.Fore.YELLOW + str(i) + reset_code)
+
+          print(board_text)
+
+          # if (self.game.state == Game.GameState.Placing):
+          # print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
+          pieces_presentation = [' '] * 63
+          for i in range(self.game.players[0].pieces_amount):
+              pieces_presentation[i] = black_piece
+          for i in range(self.game.players[1].pieces_amount):
+              pieces_presentation[62 - i] = white_piece
+          print("".join(pieces_presentation))
+
 
     def identify_piece(self, turn):
       """ Identifies which player's turn it is.
@@ -268,6 +352,132 @@ class CommandLine:
       elif self.game.state == Game.GameStage.Moving:
         self.move()
 
+    def translator(self, position):
+        if position == 'a1':
+            return '21'
+        if position == 'a4':
+            return '9'
+        if position == 'a7':
+            return '0'
+        if position == 'b2':
+            return '18'
+        if position == 'b4':
+            return '10'
+        if position == 'b6':
+            return '3'
+        if position == 'c3':
+            return '15'
+        if position == 'c4':
+            return '11'
+        if position == 'c5':
+            return '6'
+        if position == 'd1':
+            return '22'
+        if position == 'd2':
+            return '19'
+        if position == 'd3':
+            return '16'
+        if position == 'd5':
+            return '7'
+        if position == 'd6':
+            return '4'
+        if position == 'd7':
+            return '1'
+        if position == 'e3':
+            return '17'
+        if position == 'e4':
+            return '12'
+        if position == 'e5':
+            return '8'
+        if position == 'f2':
+            return '20'
+        if position == 'f4':
+            return '13'
+        if position == 'f6':
+            return '5'
+        if position == 'g1':
+            return '23'
+        if position == 'g4':
+            return '14'
+        if position == 'g7':
+            return '2'
+
+        if position == '21':
+            return 'a1'
+        if position == '9':
+            return 'a4'
+        if position == '0':
+            return 'a7'
+        if position == '18':
+            return 'b2'
+        if position == '10':
+            return 'b4'
+        if position == '3':
+            return 'b6'
+        if position == '15':
+            return 'c3'
+        if position == '11':
+            return 'c4'
+        if position == '6':
+            return 'c5'
+        if position == '22':
+            return 'd1'
+        if position == '19':
+            return 'd2'
+        if position == '16':
+            return 'd3'
+        if position == '7':
+            return 'd5'
+        if position == '4':
+            return 'd6'
+        if position == '1':
+            return 'd7'
+        if position == '17':
+            return 'e3'
+        if position == '12':
+            return 'e4'
+        if position == '8':
+            return 'e5'
+        if position == '20':
+            return 'f2'
+        if position == '13':
+            return 'f4'
+        if position == '5':
+            return 'f6'
+        if position == '23':
+            return 'g1'
+        if position == '14':
+            return 'g4'
+        if position == '2':
+            return 'g7'
+
+    def read_from_save_file(self):
+        data = None
+        ai_move = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            ai_move = data["data"]["ai_previous_move"][1]
+            print(ai_move)
+
+    def write_to_save_file(self, position):
+        data = None
+        # t_posistion = self.translator(position)
+
+
+        with open('save_file.json', "w") as f:
+            data["map"]["c_nodes"]["c4"] = "X"
+            json.dump(data, f)
+
+    def play_against_AI(self, difficulty):
+        manage_game.delete_game_file()
+        manage_game.create_game_file()
+        self.read_from_save_file()
+        run_AI(difficulty)
+
+
+
+
+
     def menu(self):
       """Prints out the menu and gets the user's input.
         If the input is 1, it will create and start the game. It will check after every turn if any player has won. If a player has won, it will print who won and the menu again.
@@ -312,12 +522,19 @@ class CommandLine:
                 print("It's a draw! Max amount of turns is 200")
                 break
           elif user_input_again =='2':
+
             print('This is where we play against the AI')
-            user_input = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
-            run_AI.run_AI(user_input, saveGame)
+            difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+            self.play_against_AI(difficulty)
+            self.read_from_save_file()
+
+
+
             menu_input = input('<- Back to main menu, input 3 and press enter: ')
+
             if menu_input == '3':
               clear_screen()
+
         elif user_input == '2':
           print('This is where we play Online')
           #remove these when we add stuff

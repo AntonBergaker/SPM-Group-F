@@ -1,11 +1,11 @@
 from os import path
-from AI_hard import run_game_hard
-from AI_medium import run_game_medium
-from AI import run_game_easy
-from saveGame import load_save_file
+from .AI_hard import run_game_hard
+from .AI_medium import run_game_medium
+from .AI import run_game_easy
+from .saveGame import load_save_file
 import sys
 
-def run_AI(difficulty, game_state): #Add second argument here with the current gamestate
+def run_AI(difficulty): #Add second argument here with the current gamestate
     data = load_save_file()
     if(int(difficulty) == 0):
         response = run_game_easy(data)
@@ -18,7 +18,7 @@ def run_AI(difficulty, game_state): #Add second argument here with the current g
     
     return response
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     if(len(sys.argv) > 1):
         run_AI(sys.argv[1]) 
     else:

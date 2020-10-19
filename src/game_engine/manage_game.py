@@ -1,5 +1,5 @@
 from os import path
-from saveGame import *
+from .saveGame import *
 import sys
 
 def create_game_file():

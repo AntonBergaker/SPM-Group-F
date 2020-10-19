@@ -1,5 +1,5 @@
-from classes import * 
-from saveGame import *
+from .classes import *
+from .saveGame import *
 from random import choice
 import sys
 # Defining constant values.
@@ -22,8 +22,10 @@ def make_move(gamestate, chosen_node, phase):
     '''
     if(phase == 1):
         chosen_node.owner = AI
+        #node_to.owner = AI
         gamestate.AI.markers_left_to_play -= 1
         gamestate.AI.markers_on_board += 1
+        #gamestate.AI.previous_move[1] = node_to.get_node_label()
 
         removed = None
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
@@ -275,9 +277,11 @@ def run_game_easy(data):
         # Chosing randomly where to place next piece.
         chosen_place = choice(possible_nodes)
         print(f'Placing ai marker at: {chosen_place}')
+
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1)
         chosen_place_label = chosen_place.get_node_label() if chosen_place != None else None
+        gamestate.AI.previous_move[1] = f'{chosen_place_label}'
         chosen_move_labels = None
 
     elif (gamestate.AI.markers_on_board > 3):

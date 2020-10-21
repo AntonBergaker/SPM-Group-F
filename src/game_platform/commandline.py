@@ -265,7 +265,7 @@ class CommandLine:
                 print("Something went wrong")
 
     def ai_eliminate(self, eliminate_position):
-        position = eliminate_position - 1
+        position = eliminate_position
         self.game.eliminate_piece(position)
 
     def place(self):
@@ -298,8 +298,8 @@ class CommandLine:
 
     def ai_place(self, ai_position):
         while True:
-            position = ai_position - 1
-            result = self.game.can_place_piece(self.game.turn, position)
+            position = ai_position
+            self.game.place_piece(self.game.turn, position)
             break
 
     def move(self):
@@ -363,13 +363,14 @@ class CommandLine:
           Keyword arguments:
           return -- Prints out different messages depending on the user's input and updates the board accordingly.
         """
-
-        if (self.game.eliminating == True):
-            self.eliminate()
-        elif self.game.state == Game.GameStage.Placing:
+        if self.game.state == Game.GameStage.Placing:
             self.place()
+            if (self.game.eliminating == True):
+                self.eliminate()
         elif self.game.state == Game.GameStage.Moving:
             self.move()
+            if (self.game.eliminating == True):
+                self.eliminate()
 
     def ai_play(self):
         if (self.game.eliminating == True):
@@ -377,7 +378,8 @@ class CommandLine:
             self.ai_eliminate(wants_to_eliminate)
         elif self.game.state == Game.GameStage.Placing:
             ai_place = self.ai_moves_to()
-            self.ai_place(ai_place)
+            print("Tjabba" + ai_place)
+            self.ai_place(self.translator(ai_place))
         elif self.game.state == Game.GameStage.Moving:
             ai_place = self.ai_moves_to()
             ai_move = self.ai_moves_from()
@@ -385,53 +387,53 @@ class CommandLine:
 
     def translator(self, position):
         if position == 'a1':
-            return '21'
+            return 21
         if position == 'a4':
-            return '9'
+            return 9
         if position == 'a7':
-            return '0'
+            return 0
         if position == 'b2':
-            return '18'
+            return 18
         if position == 'b4':
-            return '10'
+            return 10
         if position == 'b6':
-            return '3'
+            return 3
         if position == 'c3':
-            return '15'
+            return 15
         if position == 'c4':
-            return '11'
+            return 11
         if position == 'c5':
-            return '6'
+            return 6
         if position == 'd1':
-            return '22'
+            return 22
         if position == 'd2':
-            return '19'
+            return 19
         if position == 'd3':
-            return '16'
+            return 16
         if position == 'd5':
-            return '7'
+            return 7
         if position == 'd6':
-            return '4'
+            return 4
         if position == 'd7':
-            return '1'
+            return 1
         if position == 'e3':
-            return '17'
+            return 17
         if position == 'e4':
-            return '12'
+            return 12
         if position == 'e5':
-            return '8'
+            return 8
         if position == 'f2':
-            return '20'
+            return 20
         if position == 'f4':
-            return '13'
+            return 13
         if position == 'f6':
-            return '5'
+            return 5
         if position == 'g1':
-            return '23'
+            return 23
         if position == 'g4':
-            return '14'
+            return 14
         if position == 'g7':
-            return '2'
+            return 2
 
         if position == '21':
             return 'a1'
@@ -507,11 +509,14 @@ class CommandLine:
         player = self.game.get_player_from_piece(self.game.turn)
         if (self.game.eliminating == True):
             eliminate = player.previous_move[2]
-            t_eliminate = self.translator(eliminate)
+            t_eliminate = self.translator(str(eliminate))
+            print("T-el" + t_eliminate)
             self.write_to_save_file(t_eliminate, "-")
         elif self.game.state == Game.GameStage.Placing:
             move_to = player.previous_move[1]
-            t_move_to = self.translator(move_to)
+            t_move_to = self.translator(str(move_to))
+            print(t_move_to)
+            print(move_to)
             self.write_to_save_file(t_move_to, "X")
 
         elif self.game.state == Game.GameStage.Moving:
@@ -522,12 +527,21 @@ class CommandLine:
             self.write_to_save_file(t_move_from, "-")
             self.write_to_save_file(t_move_to, "X")
 
+    def get_first_char(self, str):
+        return
+
     def write_to_save_file(self, position, type):
         data = None
-        node = position[0] + "_nodes"
+        print(position)
+        node = str(position[0]) + "_nodes"
+        print(node)
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            f.close()
         with open('save_file.json', "w") as f:
-            data["map"][f'{node}'][f'{position}'] = f'{type}'
+            data["map"][node][position] = str(type)
             json.dump(data, f)
+            f.close()
 
     def decrease_markers_left(self):
         data = None
@@ -548,8 +562,7 @@ class CommandLine:
         # AI plays -> Read save_file -> Translate output -> Send it in as Player 2
         # If phase 1 call moves_to and check if eliminate
         # If phase 2 call ai_moves_from
-        manage_game.delete_game_file()
-        manage_game.create_game_file()
+
         while (True):
             self.print_board()
             self.play()
@@ -567,8 +580,23 @@ class CommandLine:
                 self.print_board()
                 print("It's a draw! Max amount of turns is 200")
                 break
+            self.player_to_ai_board()
+            run_AI(difficulty)
+            self.ai_play()
+            result = self.game.get_game_winner()
 
-        run_AI(difficulty)
+            if (result == Game.WinnerResults.BlackWon):
+                self.print_board()
+                print("Black has won the game")
+                break
+            if (result == Game.WinnerResults.WhiteWon):
+                self.print_board()
+                print("White has won the game")
+                break
+            if (result == Game.WinnerResults.Tie):
+                self.print_board()
+                print("It's a draw! Max amount of turns is 200")
+                break
 
     def menu(self):
         """Prints out the menu and gets the user's input.
@@ -614,7 +642,9 @@ class CommandLine:
                             print("It's a draw! Max amount of turns is 200")
                             break
                 elif user_input_again == '2':
-
+                    self.game = Game()
+                    manage_game.delete_game_file()
+                    manage_game.create_game_file()
                     print('This is where we play against the AI')
                     difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
                     self.play_against_AI(difficulty)

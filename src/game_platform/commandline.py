@@ -410,6 +410,11 @@ class CommandLine:
             self.ai_move(ai_move, ai_place)
 
     def translator(self, position):
+        """ This function takes a position (string) and returnes the corresponding
+            position on the other board. Player -> AI and AI -> Player.
+            The positions corresponding on the players board are retuned as int
+            and the positions corresponding on the AIs board are returned as strings.
+        """
         print("in_trans :" + str(position) )
         if position == 'a1':
             return 21
@@ -510,6 +515,9 @@ class CommandLine:
             return 'g7'
 
     def ai_moves_to(self):
+        """ This function reads where the AI moved to, in the save_file.json
+            in ai_previous_move[1] and returns the position (string).
+        """
         data = None
         ai_move = None
         with open('save_file.json', "r") as f:
@@ -518,6 +526,9 @@ class CommandLine:
             return ai_move
 
     def ai_moves_from(self):
+        """ This function reads where the AI moved from, in the save_file.json
+            in ai_previous_move[0] and returns the position (string).
+        """
         data = None
         ai_move = None
         with open('save_file.json', "r") as f:
@@ -526,10 +537,17 @@ class CommandLine:
             return ai_move
 
     def ai_wants_to_eliminate(self):
-
+        """ This function will return the position (string) of the piece the
+            AI eliminates.
+        """
+        # TODO
         return
 
     def player_to_ai_board(self):
+        """ This function implements the changes on the players board on to
+            the AIs board as well. This is the function to call after the
+            players turn.
+        """
         data = None
         player = self.game.get_player_from_piece(self.game.turn)
         if (self.game.ai_eliminated == True):
@@ -538,6 +556,7 @@ class CommandLine:
             print("T-el" + t_eliminate)
             self.write_to_save_file(t_eliminate, "-")
             self.game.ai_eliminated = False
+
         elif self.game.state == Game.GameStage.Placing:
             move_to = player.previous_move[1]
             t_move_to = self.translator(str(move_to))
@@ -554,10 +573,14 @@ class CommandLine:
             self.write_to_save_file(t_move_from, "-")
             self.write_to_save_file(t_move_to, "X")
 
-    def get_first_char(self, str):
-        return
-
     def write_to_save_file(self, position, type):
+        """ This function takes the transladet position (string) that should get
+            changed on the AIs board and the type that the position should be
+            change to.
+
+            Example: position = "a7", type = "-" if the player eliminated
+            the AIs piece on position 0 (the player sees that as position 1).
+        """
         data = None
         print(position)
         node = str(position[0]) + "_nodes"
@@ -571,6 +594,9 @@ class CommandLine:
             f.close()
 
     def decrease_markers_left(self):
+        """ This function should decrease the players numbers of markers left
+            in the AIs save_file.
+        """
         data = None
         with open('save_file.json', "r") as f:
             data["data"]["player_markers_left"]
@@ -584,6 +610,12 @@ class CommandLine:
             f.close()
 
     def play_against_AI(self, difficulty):
+        """ This function takes in the chosen difficulty level (string) of the
+            AI and plays against the AI. It lets both the AI and the Player play
+            and translates the moves and updates both the boards between the
+            turns. This is the function to call than manage the overall game
+            against the AI.
+        """
         # Delete save_file
         # Create save_file
         # While loop that checks how long we play
@@ -672,10 +704,12 @@ class CommandLine:
                             break
                 elif user_input_again == '2':
                     self.game = Game()
+                    #Makes sure that its a new game_file every new game against the AI.
                     manage_game.delete_game_file()
                     manage_game.create_game_file()
                     print('This is where we play against the AI')
                     difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+                    #Calls on the funciton that mainly manage the game against the AI.
                     self.play_against_AI(difficulty)
 
                     menu_input = input('<- Back to main menu, input 3 and press enter: ')

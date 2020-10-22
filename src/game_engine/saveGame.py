@@ -24,7 +24,7 @@ def create_save_file():
             'data': {'ai_marker' : 'O',
             'ai_markers_left' : 12,
             'ai_markers_on_board' : 0,
-            'ai_previous_move' : [None, None, False],
+            'ai_previous_move' : [None, None, False, None],
             'player_marker' : 'X',
             'player_markers_left' : 12,
             'player_markers_on_board' : 0,

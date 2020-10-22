@@ -50,15 +50,22 @@ def make_move(gamestate, chosen_node, phase, real):
         # Given move gets placed by changing the owner of the given node.
         change_owner(gamestate, chosen_node, AI)
         # Updates the gamestate for the AI.
+        gamestate.player.markers_left_to_play -= 1
         gamestate.AI.markers_left_to_play -= 1
         gamestate.AI.markers_on_board += 1
         # Checks three-in-a-row.
         removed = None
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
+            gamestate.AI.previous_move[2] = True
+        else:
+            gamestate.AI.previous_move[2] = False
+        if (check_three_in_a_row(gamestate, chosen_node, AI)):
             if(real):
                 print('AI created a three in a row')
+
             # If we find one, remove an opponent piece.
             removed = remove_opponent_piece(gamestate, real)
+
         return True, removed
 
     # Phase 2 or 3 move.
@@ -244,6 +251,7 @@ def remove_opponent_piece(gamestate, real):
             for node in line.nodes:
                 if ((node.get_node_label() == chosen_node.get_node_label()) and (node.owner == PLAYER)):
                     change_owner(gamestate, node, EMPTY)
+                    gamestate.AI.previous_move[3] = node.get_node_label()
                     gamestate.player.markers_on_board -= 1
                     return node.get_node_label()
     else:

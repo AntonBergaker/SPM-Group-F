@@ -269,6 +269,7 @@ class CommandLine:
             to eliminate and eliminate the piece on the players board.
         """
         position = eliminate_position
+        print("Position_ai: " + str(position))
         self.game.eliminate_piece(position)
 
     def place(self):
@@ -396,18 +397,22 @@ class CommandLine:
             implements them on the players board as well. This is the function
             to call after the AIs turn.
         """
-        #TODO Fix the if statement to check the third element in AIs_previous_move instead
-        if (self.ai_eliminating() == True):
-            wants_to_eliminate = self.ai_wants_to_eliminate()
-            self.ai_eliminate(wants_to_eliminate)
-        elif self.game.state == Game.GameStage.Placing:
+
+
+        if self.game.state == Game.GameStage.Placing:
             ai_place = self.ai_moves_to()
             print("Tjabba" + str(ai_place))
             self.ai_place(self.translator(str(ai_place)))
+            if (self.ai_eliminating() == True):
+                wants_to_eliminate = self.ai_wants_to_eliminate()
+                self.ai_eliminate(self.translator(wants_to_eliminate))
         elif self.game.state == Game.GameStage.Moving:
             ai_place = self.ai_moves_to()
             ai_move = self.ai_moves_from()
             self.ai_move(ai_move, ai_place)
+            if (self.ai_eliminating() == True):
+                wants_to_eliminate = self.ai_wants_to_eliminate()
+                self.ai_eliminate(self.translator(wants_to_eliminate))
 
     def translator(self, position):
         """ This function takes a position (string) and returnes the corresponding
@@ -540,8 +545,14 @@ class CommandLine:
         """ This function will return the position (string) of the piece the
             AI eliminates.
         """
-        # TODO
-        return
+        data = None
+        ai_eliminate_piece = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            ai_eliminate_piece = data["data"]["ai_previous_move"][3]
+            print("AI_eli_piece"+ai_eliminate_piece)
+            return ai_eliminate_piece
+
 
     def player_to_ai_board(self):
         """ This function implements the changes on the players board on to
@@ -563,7 +574,7 @@ class CommandLine:
             print(t_move_to)
             print(move_to)
             self.write_to_save_file(t_move_to, "X")
-            self.decrease_markers_left()
+            #self.decrease_markers_left()
 
         elif self.game.state == Game.GameStage.Moving:
             move_from = player.previous_move[0]
@@ -592,11 +603,11 @@ class CommandLine:
             data["map"][node][position] = str(type)
             json.dump(data, f)
             f.close()
-
+    """
     def decrease_markers_left(self):
-        """ This function should decrease the players numbers of markers left
+       """ """ This function should decrease the players numbers of markers left
             in the AIs save_file.
-        """
+       """ """
         data = None
         with open('save_file.json', "r") as f:
             data["data"]["player_markers_left"]
@@ -608,7 +619,7 @@ class CommandLine:
             data["data"]["player_markers_left"] = new_markers
             json.dump(data, f)
             f.close()
-
+    """
     def play_against_AI(self, difficulty):
         """ This function takes in the chosen difficulty level (string) of the
             AI and plays against the AI. It lets both the AI and the Player play

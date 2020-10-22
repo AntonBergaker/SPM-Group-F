@@ -182,7 +182,7 @@ class Game:
         return -- True if piece on the given position can be eliminated, otherwise False.
         """
         if (self.can_eliminate_piece(position) != self.CanElimateResults.Ok):
-            return False
+           return False
         self.board[position] = Piece.Empty
         self.eliminating = False
         self.ai_eliminated = True

@@ -23,14 +23,21 @@ def make_move(gamestate, chosen_node, phase):
     if(phase == 1):
         chosen_node.owner = AI
         #node_to.owner = AI
+        gamestate.player.markers_left_to_play -= 1
         gamestate.AI.markers_left_to_play -= 1
         gamestate.AI.markers_on_board += 1
         #gamestate.AI.previous_move[1] = node_to.get_node_label()
 
         removed = None
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
+            gamestate.AI.previous_move[2] = True
+        else:
+            gamestate.AI.previous_move[2] = False
+        if (check_three_in_a_row(gamestate, chosen_node, AI)):
             print('AI created a three in a row')
+
             removed = remove_opponent_piece(gamestate)
+
 
         return True, removed
 
@@ -160,6 +167,7 @@ def remove_opponent_piece(gamestate):
                 if ((node.get_node_label() == chosen_node.get_node_label()) and (node.owner == PLAYER)):
                     node.owner = EMPTY
                     gamestate.player.markers_on_board -= 1
+                    gamestate.AI.previous_move[3] = node.get_node_label()
                     print(f"REMOVING PLAYER PIECE AT: {chosen_node}")
                     return node.get_node_label()
     else:

@@ -77,7 +77,7 @@ class CommandLine:
 
         clear_screen()
 
-        board_text = """ 
+        board_text = """
 1                            2                             3
   A-----------------------------C-----------------------------D
   |)                            |                           / |
@@ -161,7 +161,7 @@ class CommandLine:
 
             clear_screen()
 
-            board_text = """ 
+            board_text = """
     1                            2                             3
       A-----------------------------C-----------------------------D
       |)                            |                           / |
@@ -265,6 +265,9 @@ class CommandLine:
                 print("Something went wrong")
 
     def ai_eliminate(self, eliminate_position):
+        """ Takes the translated AIs position (int) of the piece the AI wanted
+            to eliminate and eliminate the piece on the players board.
+        """
         position = eliminate_position
         self.game.eliminate_piece(position)
 
@@ -297,6 +300,9 @@ class CommandLine:
                 print("Something went wrong.")
 
     def ai_place(self, ai_position):
+        """ Takes the translated AIs position (int) to the piece the AI places and
+            places it on the players board.
+        """
         while True:
             position = ai_position
             print("Pos " + str(position))
@@ -349,6 +355,9 @@ class CommandLine:
                 print("Something went wrong.")
 
     def ai_move(self, ai_position_from, ai_position_to):
+        """ Takes the translated AIs positions (ints) on where the AI moved from
+            and where the AI moved to and moves the pieve on the players board.
+        """
         old_position = ai_position_from - 1
         new_position = ai_position_to - 1
         self.game.move_piece(old_position, new_position)
@@ -374,6 +383,11 @@ class CommandLine:
                 self.eliminate()
 
     def ai_play(self):
+        """ This function translates the moves the AI made on its board and
+            implements them on the players board as well. This is the function
+            to call after the AIs turn.
+        """
+        #TODO Fix the if statement to check the third element in AIs_previous_move instead
         if (self.game.eliminating == True):
             wants_to_eliminate = self.ai_wants_to_eliminate()
             self.ai_eliminate(wants_to_eliminate)

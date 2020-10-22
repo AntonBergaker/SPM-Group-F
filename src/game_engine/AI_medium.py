@@ -41,10 +41,10 @@ def change_owner(gamestate, chosen_node, target):
 def make_move(gamestate, chosen_node, phase, real):
     '''
         Function that takes in a single node, in phase one, and a pair of nodes in phases 2/3.
-        Takes nodes and places or moves a piece there depending on phase. 
+        Takes nodes and places or moves a piece there depending on phase.
         Includes real argument which is a flag for when to actually make a move and when function
         is used in min-max recursion (for debugging).
-        Returns True if move was made, as well as opponent node removed if any. Returns False and None if move failed 
+        Returns True if move was made, as well as opponent node removed if any. Returns False and None if move failed
     '''
     # Phase 1 move.
     if(phase == 1):
@@ -61,12 +61,12 @@ def make_move(gamestate, chosen_node, phase, real):
                 print('AI created a three in a row')
             # If we find one, remove an opponent piece.
             removed = remove_opponent_piece(gamestate, real)
-        
+
         return True, removed
 
     # Phase 2 or 3 move.
     if(phase != 1):
-        # Node source and destination are paired in a dict: {source : dest} 
+        # Node source and destination are paired in a dict: {source : dest}
         # so they are unpacked.
         removed = None
         for node_from, node_to in chosen_node.items():
@@ -76,7 +76,7 @@ def make_move(gamestate, chosen_node, phase, real):
                 gamestate.AI.previous_move[1] = node_to.get_node_label()
                 if (check_three_in_a_row(gamestate, node_from, AI)):
                     gamestate.AI.previous_move[2] = True
-                else: 
+                else:
                     gamestate.AI.previous_move[2] = False
                 # Actual updating of nodes happens here.
                 change_owner(gamestate, node_from, EMPTY)
@@ -92,7 +92,7 @@ def make_move(gamestate, chosen_node, phase, real):
 
 def make_opponent_move(gamestate, chosen_node, phase):
     '''
-        Function that takes in a node and places or moves a piece there depending on phase. 
+        Function that takes in a node and places or moves a piece there depending on phase.
         Returns True if move was made, and False otherwise
     '''
     # Phase 1 move.
@@ -108,7 +108,7 @@ def make_opponent_move(gamestate, chosen_node, phase):
         return True
 
     if(phase != 1):
-        # Node source and destination are paired in a dict: {source : dest} 
+        # Node source and destination are paired in a dict: {source : dest}
         # so they are unpacked.
         for node_from, node_to in chosen_node.items():
             # Check if the move can be made.
@@ -121,7 +121,7 @@ def make_opponent_move(gamestate, chosen_node, phase):
                 gamestate.AI.previous_move[1] = node_to.get_node_label()
                 if (check_three_in_a_row(gamestate, node_from, PLAYER)):
                     gamestate.AI.previous_move[2] = True
-                else: 
+                else:
                     gamestate.AI.previous_move[2] = False
 
                 if (check_three_in_a_row(gamestate, node_to, PLAYER)):
@@ -133,12 +133,12 @@ def make_opponent_move(gamestate, chosen_node, phase):
 
 def check_legal_move(gamestate, node_from, node_to, real):
     '''
-    Checks that AI doesn't move back to a three-in-a-row from another three-in-a-row. 
+    Checks that AI doesn't move back to a three-in-a-row from another three-in-a-row.
     Returns True if valid move, and False otherwise
     '''
     if(check_three_in_a_row(gamestate, node_from, AI) and (gamestate.AI.previous_move[2] == True) and (node_to.get_node_label() == gamestate.AI.previous_move[0])):
         return False
-    else: 
+    else:
         return True
 
 
@@ -147,7 +147,7 @@ def get_possible_nodes(gamestate, target):
         Function that takes in the loaded save file
         and returns the nodes that are target.
     '''
-    
+
     possible = []
     # Iterates through the lines ...
     for line in gamestate.gameboard.lines:
@@ -196,10 +196,10 @@ def all_nodes_in_line_belongs_to_target(gamestate, line, target):
         Can either be AI or PLAYER
     ----------
     Returns:
-        True if the target has won 
+        True if the target has won
         , else false.
     '''
-    
+
     for node in line.nodes:
         if(node.owner != target):
             return False
@@ -224,12 +224,12 @@ def remove_opponent_piece(gamestate, real):
     ----------
     gamestate:
         a gamestate object containing the AI, PLAYER and gameboard.
-    real: 
+    real:
         a flag for debugging puropses which indicates if the function
         is used in minmax recursion.
     ----------
     Returns:
-        Name of opponent node removed, and None if removal failed   
+        Name of opponent node removed, and None if removal failed
     '''
     opponent_nodes = get_possible_nodes(gamestate, PLAYER)
     if (len(opponent_nodes) > 0):
@@ -244,7 +244,7 @@ def remove_opponent_piece(gamestate, real):
             for node in line.nodes:
                 if ((node.get_node_label() == chosen_node.get_node_label()) and (node.owner == PLAYER)):
                     change_owner(gamestate, node, EMPTY)
-                    gamestate.player.markers_on_board -= 1 
+                    gamestate.player.markers_on_board -= 1
                     return node.get_node_label()
     else:
         return None
@@ -280,8 +280,8 @@ def remove_AI_piece(gamestate):
 
 def get_neighbours(gamestate, node_list):
     '''
-        Function that takes the gamestate and a target node 
-        and looks at the gamestates lines to find the surrounding 
+        Function that takes the gamestate and a target node
+        and looks at the gamestates lines to find the surrounding
         nodes and returns them in a list.
     '''
     if(not isinstance(node_list, list)):
@@ -291,10 +291,10 @@ def get_neighbours(gamestate, node_list):
         neighbours[node] = []
         for line in gamestate.gameboard.lines:
             '''
-                Compares node labels instead of instances since nodes belong to different 
-                gamestates most of the time. Matching with labels makes sure that the 
+                Compares node labels instead of instances since nodes belong to different
+                gamestates most of the time. Matching with labels makes sure that the
                 conditionals work even though the nodes are different.
-                (if comparing node1 == node2 the result is always False, since they are not the 
+                (if comparing node1 == node2 the result is always False, since they are not the
                 exact same)
             '''
             if (line.nodes[0].get_node_label()) == node.get_node_label():
@@ -307,7 +307,7 @@ def get_neighbours(gamestate, node_list):
                 neighbours[node].append(line.nodes[1])
     return neighbours
 
-def winning_check(gamestate, target): 
+def winning_check(gamestate, target):
     '''
     Checks if the target has won
     ----------
@@ -331,13 +331,13 @@ def winning_check(gamestate, target):
             if (gamestate.AI.markers_on_board <= 2):
                 return True
     return False
-            
+
 
 def node_to_piece(node_list):
     '''
-    Function that takes a list of nodes (possibly a list containing only one node) 
+    Function that takes a list of nodes (possibly a list containing only one node)
     and returns the corresponding owners of sAId nodes in a list of the same order
-    as the passed list. 
+    as the passed list.
 
     This is not in use.
     '''
@@ -345,7 +345,7 @@ def node_to_piece(node_list):
     for node in node_list:
         piece = node.owner
         pieces.append(piece)
-        
+
     return pieces
 
 def get_all_possible_moves(gamestate, phase, target):
@@ -355,7 +355,7 @@ def get_all_possible_moves(gamestate, phase, target):
     ----------
     gamestate:
         a gamestate object containing the gamestate.
-    phase: 
+    phase:
         the phase in which to move.
     target:
         Can either be AI or PLAYER.
@@ -369,9 +369,9 @@ def get_all_possible_moves(gamestate, phase, target):
         return get_possible_nodes(gamestate, EMPTY)
     if(phase == 2):
         '''
-            In phase 2 we find all nodes where the actor has nodes and then 
-            find all the adjacent nodes. 
-            For each possible node: if an adjacent node is empty, it is a possible destination and the 
+            In phase 2 we find all nodes where the actor has nodes and then
+            find all the adjacent nodes.
+            For each possible node: if an adjacent node is empty, it is a possible destination and the
             possible node and its neighbour are paired {possible node : neighbour}
         '''
         possible_nodes = get_possible_nodes(gamestate, target)
@@ -415,7 +415,7 @@ def check_phase(gamestate, is_opponent):
         elif(gamestate.player.markers_on_board > 3):
             return 2
         elif(gamestate.player.markers_left_to_play <= 3):
-            return 3 
+            return 3
 
 def board_score(gamestate, target):
     '''
@@ -438,7 +438,7 @@ def board_score(gamestate, target):
         if owners.count(opponent) == 3:
             score -= -9
         if owners.count(opponent) == 2 and owners.count(EMPTY) == 1:
-            score -= 8 
+            score -= 8
 
     return score
 
@@ -467,19 +467,19 @@ def blocking_move(gamestate, node, target):
 def minmax(is_AI, gamestate, phase, depth, alpha, beta):
     '''
     Recursive optimization to find which move leads to the most promising branch of moves.
-    Will play optimally if search space allows algorithm to find winning moves, else will use 
+    Will play optimally if search space allows algorithm to find winning moves, else will use
     a defined scoring function to interpret the gamestate and score at depth 0.
     ----------
     Parameters
     ----------
     gamestate:
         a gamestate object containing the gamestate.
-    phase: 
+    phase:
         the phase in which to move.
     depth:
         How many turns ahead the algorithm will look before using the score function.
         Used to avoid hitting recursion limit and to speed up the calculation.
-    alpha/beta: 
+    alpha/beta:
         The alpha and beta parameters in the alpha-beta pruning method.
     ----------
     Returns:
@@ -492,9 +492,9 @@ def minmax(is_AI, gamestate, phase, depth, alpha, beta):
         return None, -100000
     elif(depth == 0):
         return (None, board_score(gamestate, AI))
-    
+
     if (is_AI):
-        all_possible_moves = get_all_possible_moves(gamestate, phase, AI) 
+        all_possible_moves = get_all_possible_moves(gamestate, phase, AI)
         max_score = -inf
         best_move = choice(all_possible_moves)
 
@@ -517,7 +517,7 @@ def minmax(is_AI, gamestate, phase, depth, alpha, beta):
                         best_score = 1000
                         best_move = move
                         return best_move, best_score
-                    elif(blocking_move(g, node_to, AI)): 
+                    elif(blocking_move(g, node_to, AI)):
                         best_score = 500
                         best_move = move
                         return best_move, best_score
@@ -527,7 +527,7 @@ def minmax(is_AI, gamestate, phase, depth, alpha, beta):
                         best_score = 1000
                         best_move = move
                         return best_move, best_score
-                    elif(blocking_move(g, node_to, AI)): 
+                    elif(blocking_move(g, node_to, AI)):
                         best_score = 500
                         best_move = move
                         return best_move, best_score
@@ -537,14 +537,14 @@ def minmax(is_AI, gamestate, phase, depth, alpha, beta):
             if(score > max_score):
                 max_score = score
                 best_move = move
-            
+
             alpha = max(alpha, max_score)
             if alpha >= beta:
                 break
         return best_move, max_score
 
     else:
-        all_possible_moves = get_all_possible_moves(gamestate, phase, PLAYER) 
+        all_possible_moves = get_all_possible_moves(gamestate, phase, PLAYER)
         min_score = inf
         best_move = choice(all_possible_moves)
 
@@ -557,7 +557,7 @@ def minmax(is_AI, gamestate, phase, depth, alpha, beta):
             if(score < min_score):
                 min_score = score
                 best_move = move
-            
+
             beta = min(beta, min_score)
             if alpha >= beta:
                 break
@@ -575,7 +575,7 @@ def run_game_medium(data):
     ----------
     Returns:
         An object containing:
-        - status: a status code (0 if game is still in play, 1 if player has won or -1 if AI has won) 
+        - status: a status code (0 if game is still in play, 1 if player has won or -1 if AI has won)
         - gamestateJSON: the full updated gamestate in JSON format
         - place: the node placed at in phase 1. Will be none in phase 2 and 3
         - move: an object with the node moved from as key and node moved to as value. Will be None in phase 1
@@ -603,7 +603,7 @@ def run_game_medium(data):
                     'place': None, 'move': None, 'removed': None
         }
         return response
-    else: 
+    else:
         status = 0
 
     # Checking if in phase 1 of the game.
@@ -614,7 +614,7 @@ def run_game_medium(data):
         if rand > 7:
             chosen_place = choice(get_all_possible_moves(gamestate, 1, AI))
             make_move(gamestate, chosen_place, 1, True)
-        else: 
+        else:
             possible_nodes = get_possible_nodes(gamestate, EMPTY)
             if (len(get_possible_nodes(gamestate, EMPTY)) > 9):
                 chosen_place, max_score = minmax(True, gamestate, 1, 3, -inf, inf)
@@ -626,6 +626,7 @@ def run_game_medium(data):
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1, True)
         chosen_place_label = chosen_place.get_node_label() if chosen_place != None else None
+#This is where we update the AIs previous move!!!! (GROUP F!!!!!)
         gamestate.AI.previous_move[1] = f'{chosen_place_label}'
         chosen_move_labels = None
 
@@ -644,7 +645,7 @@ def run_game_medium(data):
 
         if(len(possible_neighbours) > 0):
             moved = False
-            rand = random.randint(1, 10) 
+            rand = random.randint(1, 10)
             while (not moved):
                 if rand > 7:
                     chosen_move = choice(get_all_possible_moves(gamestate, 2, AI))
@@ -697,10 +698,10 @@ def run_game_medium(data):
         status = -1
     elif (winning_check(gamestate, PLAYER)):
         status = 1
-    else: 
+    else:
         status = 0
     response = {
-                'status': status, 'gamestateJSON': gamestate.to_json(), 
+                'status': status, 'gamestateJSON': gamestate.to_json(),
                 'place': chosen_place_label,
                 'move': chosen_move_labels,
                 'removed': removed

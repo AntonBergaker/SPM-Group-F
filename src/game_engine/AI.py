@@ -9,7 +9,7 @@ EMPTY = '-'
 
 def update_markers_on_board_numbers(gamestate):
     '''
-        Function that takes in a gamestate and updates the number of player and AI markers on board 
+        Function that takes in a gamestate and updates the number of player and AI markers on board
         in that gamestate.
     '''
     gamestate.AI.markers_on_board = len(get_possible_nodes(gamestate, AI))
@@ -17,8 +17,8 @@ def update_markers_on_board_numbers(gamestate):
 
 def make_move(gamestate, chosen_node, phase):
     '''
-        Function that takes in a node and places or moves a piece there depending on phase. 
-        Returns True if move was made, as well as opponent node removed if any. Returns False and None if move failed    
+        Function that takes in a node and places or moves a piece there depending on phase.
+        Returns True if move was made, as well as opponent node removed if any. Returns False and None if move failed
     '''
     if(phase == 1):
         chosen_node.owner = AI
@@ -31,7 +31,7 @@ def make_move(gamestate, chosen_node, phase):
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
             print('AI created a three in a row')
             removed = remove_opponent_piece(gamestate)
-        
+
         return True, removed
 
     if(phase != 1):
@@ -41,12 +41,12 @@ def make_move(gamestate, chosen_node, phase):
             if(check_legal_move(gamestate, node_from, node_to)):
                 node_from.owner = EMPTY
                 node_to.owner = AI
-                
+
                 gamestate.AI.previous_move[0] = node_from.get_node_label()
                 gamestate.AI.previous_move[1] = node_to.get_node_label()
                 if (check_three_in_a_row(gamestate, node_from, AI)):
                     gamestate.AI.previous_move[2] = True
-                else: 
+                else:
                     gamestate.AI.previous_move[2] = False
 
                 if (check_three_in_a_row(gamestate, node_to, AI)):
@@ -60,12 +60,12 @@ def make_move(gamestate, chosen_node, phase):
 
 def check_legal_move(gamestate, node_from, node_to):
     '''
-    Checks that AI doesn't move back to a three-in-a-row from another three-in-a-row. 
+    Checks that AI doesn't move back to a three-in-a-row from another three-in-a-row.
     Returns True if valid move, and False otherwise
     '''
     if(check_three_in_a_row(gamestate, node_from, AI) and gamestate.AI.previous_move[2] == True and node_to.get_node_label() == gamestate.AI.previous_move[0]):
         return False
-    else: 
+    else:
         return True
 
 
@@ -118,7 +118,7 @@ def all_nodes_in_line_belongs_to_target(gamestate, a_line, target):
         Can either be AI or PLAYER
     ----------
     Returns:
-        True if the target has won 
+        True if the target has won
         , else false.
     '''
     for node in a_line.nodes:
@@ -146,7 +146,7 @@ def remove_opponent_piece(gamestate):
         a gamestate object containing the AI, PLAYER and gameboard.
     ----------
     Returns:
-        Name of opponent node removed, and None if removal failed    
+        Name of opponent node removed, and None if removal failed
     '''
     opponent_nodes = get_possible_nodes(gamestate, PLAYER)
     if (len(opponent_nodes) > 0):
@@ -159,7 +159,7 @@ def remove_opponent_piece(gamestate):
             for node in line.nodes:
                 if ((node.get_node_label() == chosen_node.get_node_label()) and (node.owner == PLAYER)):
                     node.owner = EMPTY
-                    gamestate.player.markers_on_board -= 1 
+                    gamestate.player.markers_on_board -= 1
                     print(f"REMOVING PLAYER PIECE AT: {chosen_node}")
                     return node.get_node_label()
     else:
@@ -167,8 +167,8 @@ def remove_opponent_piece(gamestate):
 
 def get_neighbours(gamestate, node_list):
     '''
-        Function that takes the gamestate and a target node 
-        and looks at the gamestates lines to find the surrounding 
+        Function that takes the gamestate and a target node
+        and looks at the gamestates lines to find the surrounding
         nodes and returns them in a list.
     '''
     if(not isinstance(node_list, list)):
@@ -188,7 +188,7 @@ def get_neighbours(gamestate, node_list):
                 neighbours[node].append(line.nodes[1])
     return neighbours
 
-def winning_check(gamestate, target): 
+def winning_check(gamestate, target):
     '''
     Checks if the target has won
     ----------
@@ -208,25 +208,25 @@ def winning_check(gamestate, target):
         if (gamestate.player.markers_left_to_play == 0):
             if (gamestate.player.markers_on_board <= 2):
                 return True
-    else: 
+    else:
         if (gamestate.AI.markers_left_to_play == 0):
             if (gamestate.AI.markers_on_board <= 2):
                 return True
-    
+
     return False
-            
+
 
 def node_to_piece(node_list):
     '''
-    Function that takes a list of nodes (possibly a list contAIning only one node) 
+    Function that takes a list of nodes (possibly a list contAIning only one node)
     and returns the corresponding owners of sAId nodes in a list of the same order
-    as the passed list. 
+    as the passed list.
     '''
     pieces = []
     for node in node_list:
         piece = node.owner
         pieces.append(piece)
-        
+
     return pieces
 
 
@@ -241,7 +241,7 @@ def run_game_easy(data):
     ----------
     Returns:
         An object containing:
-        - status: a status code (0 if game is still in play, 1 if player has won or -1 if AI has won) 
+        - status: a status code (0 if game is still in play, 1 if player has won or -1 if AI has won)
         - gamestateJSON: the full updated gamestate in JSON format
         - place: the node placed at in phase 1. Will be none in phase 2 and 3
         - move: an object with the node moved from as key and node moved to as value. Will be None in phase 1
@@ -267,13 +267,13 @@ def run_game_easy(data):
                     'place': None, 'move': None, 'removed': None
         }
         return response
-    else: 
+    else:
         status = 0
 
     # Checking if in phase 1 of the game.
     if (gamestate.AI.markers_left_to_play > 0):
         possible_nodes = get_possible_nodes(gamestate, EMPTY)
-        
+
         # Chosing randomly where to place next piece.
         chosen_place = choice(possible_nodes)
         print(f'Placing ai marker at: {chosen_place} ')
@@ -281,6 +281,7 @@ def run_game_easy(data):
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1)
         chosen_place_label = chosen_place.get_node_label() if chosen_place != None else None
+#This is where we update the AIs previous move!!!! (GROUP F!!!!!)
         gamestate.AI.previous_move[1] = f'{chosen_place_label}'
         chosen_move_labels = None
 
@@ -305,7 +306,7 @@ def run_game_easy(data):
                 chosen_place_label = None
         else:
             print('AI cannot move anywhere. Player won!')
-                
+
     elif(gamestate.AI.markers_on_board <= 3):
         # Phase 3!
         if(gamestate.AI.markers_on_board <= 2):
@@ -333,11 +334,11 @@ def run_game_easy(data):
         status = -1
     elif (winning_check(gamestate, PLAYER)):
         status = 1
-    else: 
+    else:
         status = 0
 
     response = {
-                'status': status, 'gamestateJSON': gamestate.to_json(), 
+                'status': status, 'gamestateJSON': gamestate.to_json(),
                 'place': chosen_place_label,
                 'move': chosen_move_labels,
                 'removed': removed

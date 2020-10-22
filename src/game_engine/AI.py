@@ -276,7 +276,7 @@ def run_game_easy(data):
         
         # Chosing randomly where to place next piece.
         chosen_place = choice(possible_nodes)
-        print(f'Placing ai marker at: {chosen_place}')
+        print(f'Placing ai marker at: {chosen_place} ')
 
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1)

@@ -299,6 +299,7 @@ class CommandLine:
     def ai_place(self, ai_position):
         while True:
             position = ai_position
+            print("Pos " + str(position))
             self.game.place_piece(self.game.turn, position)
             break
 
@@ -378,14 +379,15 @@ class CommandLine:
             self.ai_eliminate(wants_to_eliminate)
         elif self.game.state == Game.GameStage.Placing:
             ai_place = self.ai_moves_to()
-            print("Tjabba" + ai_place)
-            self.ai_place(self.translator(ai_place))
+            print("Tjabba" + str(ai_place))
+            self.ai_place(self.translator(str(ai_place)))
         elif self.game.state == Game.GameStage.Moving:
             ai_place = self.ai_moves_to()
             ai_move = self.ai_moves_from()
             self.ai_move(ai_move, ai_place)
 
     def translator(self, position):
+        print("in_trans :" + str(position) )
         if position == 'a1':
             return 21
         if position == 'a4':
@@ -507,11 +509,12 @@ class CommandLine:
     def player_to_ai_board(self):
         data = None
         player = self.game.get_player_from_piece(self.game.turn)
-        if (self.game.eliminating == True):
+        if (self.game.ai_eliminated == True):
             eliminate = player.previous_move[2]
             t_eliminate = self.translator(str(eliminate))
             print("T-el" + t_eliminate)
             self.write_to_save_file(t_eliminate, "-")
+            self.game.ai_eliminated = False
         elif self.game.state == Game.GameStage.Placing:
             move_to = player.previous_move[1]
             t_move_to = self.translator(str(move_to))
@@ -522,8 +525,8 @@ class CommandLine:
         elif self.game.state == Game.GameStage.Moving:
             move_from = player.previous_move[0]
             move_to = player.previous_move[1]
-            t_move_from = self.translator(move_from)
-            t_move_to = self.translator(move_to)
+            t_move_from = self.translator(str(move_from))
+            t_move_to = self.translator(str(move_to))
             self.write_to_save_file(t_move_from, "-")
             self.write_to_save_file(t_move_to, "X")
 

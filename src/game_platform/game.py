@@ -22,6 +22,7 @@ class Game:
         self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
         self.eliminating = 0
+        self.ai_eliminated = 0
         self.total_turns = 0
 
     def get_player_from_piece(self, piece):
@@ -184,6 +185,7 @@ class Game:
             return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.ai_eliminated = True
         self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 

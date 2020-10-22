@@ -626,6 +626,7 @@ def run_game_medium(data):
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1, True)
         chosen_place_label = chosen_place.get_node_label() if chosen_place != None else None
+        gamestate.AI.previous_move[1] = f'{chosen_place_label}'
         chosen_move_labels = None
 
     # Checking if in phase 2 of the game.

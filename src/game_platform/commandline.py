@@ -358,8 +358,8 @@ class CommandLine:
         """ Takes the translated AIs positions (ints) on where the AI moved from
             and where the AI moved to and moves the pieve on the players board.
         """
-        old_position = ai_position_from - 1
-        new_position = ai_position_to - 1
+        old_position = ai_position_from
+        new_position = ai_position_to
         self.game.move_piece(old_position, new_position)
 
     def play(self):
@@ -382,13 +382,22 @@ class CommandLine:
             if (self.game.eliminating == True):
                 self.eliminate()
 
+    def ai_eliminating(self):
+        data = None
+        eliminate_state = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            eliminate_state = data["data"]["ai_previous_move"][2]
+            print("Eli - state: " + str(eliminate_state))
+            return eliminate_state
+
     def ai_play(self):
         """ This function translates the moves the AI made on its board and
             implements them on the players board as well. This is the function
             to call after the AIs turn.
         """
         #TODO Fix the if statement to check the third element in AIs_previous_move instead
-        if (self.game.eliminating == True):
+        if (self.ai_eliminating() == True):
             wants_to_eliminate = self.ai_wants_to_eliminate()
             self.ai_eliminate(wants_to_eliminate)
         elif self.game.state == Game.GameStage.Placing:
@@ -517,7 +526,7 @@ class CommandLine:
             return ai_move
 
     def ai_wants_to_eliminate(self):
-        # TODO
+
         return
 
     def player_to_ai_board(self):
@@ -535,6 +544,7 @@ class CommandLine:
             print(t_move_to)
             print(move_to)
             self.write_to_save_file(t_move_to, "X")
+            self.decrease_markers_left()
 
         elif self.game.state == Game.GameStage.Moving:
             move_from = player.previous_move[0]
@@ -565,11 +575,13 @@ class CommandLine:
         with open('save_file.json', "r") as f:
             data["data"]["player_markers_left"]
             old_markers = json.load(data, f)
+            f.close()
         new_markers = old_markers - 1
 
         with open('save_file.json', "w") as f:
             data["data"]["player_markers_left"] = new_markers
             json.dump(data, f)
+            f.close()
 
     def play_against_AI(self, difficulty):
         # Delete save_file

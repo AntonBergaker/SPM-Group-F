@@ -527,53 +527,41 @@ class CommandLine:
     """
 
 
-def play_against_AI(self, difficulty):
-    """ This function takes in the chosen difficulty level (string) of the
-        AI and plays against the AI. It lets both the AI and the Player play
-        and translates the moves and updates both the boards between the
-        turns. This is the function to call than manage the overall game
-        against the AI.
-    """
-    # Delete save_file
-    # Create save_file
-    # While loop that checks how long we play
-    # Player as Input -> Translate Input -> Save in save_file
-    # AI plays -> Read save_file -> Translate output -> Send it in as Player 2
-    # If phase 1 call moves_to and check if eliminate
-    # If phase 2 call ai_moves_from
+    def play_against_AI(self, difficulty):
+        """ This function takes in the chosen difficulty level (string) of the
+            AI and plays against the AI. It lets both the AI and the Player play
+            and translates the moves and updates both the boards between the
+            turns. This is the function to call than manage the overall game
+            against the AI.
+        """
+        # Delete save_file
+        # Create save_file
+        # While loop that checks how long we play
+        # Player as Input -> Translate Input -> Save in save_file
+        # AI plays -> Read save_file -> Translate output -> Send it in as Player 2
+        # If phase 1 call moves_to and check if eliminate
+        # If phase 2 call ai_moves_from
 
-    while (True):
-        self.print_board()
-        self.play()
-        result = self.game.get_game_winner()
+        while (True):
+            self.print_board()
+            if (self.game.turn == Piece.Black):
+               self.play()
+            else:
+                self.ai.the_ai_turn(difficulty)
+            result = self.game.get_game_winner()
 
-        if (result == Game.WinnerResults.BlackWon):
-            self.print_board()
-            print("Black has won the game")
-            break
-        if (result == Game.WinnerResults.WhiteWon):
-            self.print_board()
-            print("White has won the game")
-            break
-        if (result == Game.WinnerResults.Tie):
-            self.print_board()
-            print("It's a draw! Max amount of turns is 200")
-            break
-        self.ai.the_ai_turn(difficulty)
-        result = self.game.get_game_winner()
-
-        if (result == Game.WinnerResults.BlackWon):
-            self.print_board()
-            print("Black has won the game")
-            break
-        if (result == Game.WinnerResults.WhiteWon):
-            self.print_board()
-            print("White has won the game")
-            break
-        if (result == Game.WinnerResults.Tie):
-            self.print_board()
-            print("It's a draw! Max amount of turns is 200")
-            break
+            if (result == Game.WinnerResults.BlackWon):
+                self.print_board()
+                print("Black has won the game")
+                break
+            if (result == Game.WinnerResults.WhiteWon):
+                self.print_board()
+                print("White has won the game")
+                break
+            if (result == Game.WinnerResults.Tie):
+                self.print_board()
+                print("It's a draw! Max amount of turns is 200")
+                break
 
 
     def menu(self):
@@ -620,7 +608,7 @@ def play_against_AI(self, difficulty):
                             print("It's a draw! Max amount of turns is 200")
                             break
                 elif user_input_again == '2':
-                    self.game = Game()
+                    self.game = Game(4)
                     self.ai = AI_Player(self.game)
                     #Makes sure that its a new game_file every new game against the AI.
                     manage_game.delete_game_file()

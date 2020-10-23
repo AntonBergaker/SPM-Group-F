@@ -58,7 +58,7 @@ class AI_Player:
 
         if self.game.state == Game.GameStage.Placing:
             ai_place = self.ai_moves_to()
-            print("Tjabba" + str(ai_place))
+            print("Tjabba: " + str(ai_place))
             self.ai_place(self.translator(str(ai_place)))
             if (self.ai_eliminating() == True):
                 wants_to_eliminate = self.ai_wants_to_eliminate()

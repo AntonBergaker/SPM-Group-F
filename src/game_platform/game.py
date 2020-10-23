@@ -4,23 +4,25 @@ from .player import Player
 class Game:
     """A representation of the game and its rules.
     Contains a board located in the board variable.
-    Contains players located in an array inside the players variable
-    Contains the current turn located in the turn variable
+    Contains players located in an array inside the players variable.
+    Contains the current turn located in the turn variable.
+    Contains the total amount of turns that has been played in the game in the total_turns variable.
     """
 
     class GameStage:
         Placing = 1
         Moving = 2
 
-    def __init__(self):
+    def __init__(self, player_piece_count = 12):
         """Constructor for Game.
         Initializes a game with all variables and an empty board where it's blacks turn to play.
         """
         self.turn = Piece.Black
         self.board = Board()
-        self.players = [Player(Piece.Black), Player(Piece.White)]
+        self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
         self.eliminating = 0
+        self.total_turns = 0
 
     def get_player_from_piece(self, piece):
         """Gets the player belong to a piece
@@ -35,9 +37,31 @@ class Game:
             return self.players[1]
         return None
 
+    class WinnerResults:
+        GameInProgress = 1
+        Tie = 2
+        BlackWon = 3
+        WhiteWon = 4
+    def get_game_winner(self):
+        """Gets a WinnerResults if there is one with the winner of the game, if there is one.
+        Returns GameInProgress if the game is currently being played.
+        Returns Tie if the game ended in a draw.
+        Returns BlackWon if black won the game.
+        Returns WhiteWon if white won the game.
+        return -- WinnerResults with the game win state
+        """
+        if (self.check_if_tie()):
+            return Game.WinnerResults.Tie
+        if (self.check_if_piece_won_game(Piece.Black)):
+            return Game.WinnerResults.BlackWon
+        if (self.check_if_piece_won_game(Piece.White)):
+            return Game.WinnerResults.WhiteWon
+        
+        return Game.WinnerResults.GameInProgress
+
     def check_if_piece_won_game(self, piece):
         """"Checks if the given piece has won the game
-        
+
         Keyword arguments:
         piece -- the piece to check
         return -- True if the given piece has won, otherwise False
@@ -45,16 +69,45 @@ class Game:
         def check_if_piece_lost_game(self, piece):
             if (self.state == Game.GameStage.Placing):
                 return False
+            # Cant lose if it's the others piece's turn
+            if (self.turn != piece):
+                return False
             if (self.board.pieces_of_type_on_board(piece) <= 2):
                 return True
-            for position in range(24):
+            for position in range(Board.position_count):
                 if (self.board[position] != piece):
                     continue
-                for new_position in range(24):
+                for new_position in range(Board.position_count):
                     if (self.can_move_piece(position, new_position, True) == Game.CanMoveResults.Ok):
                         return False
             return True
         return check_if_piece_lost_game(self, self.board.get_other_piece(piece))
+
+
+    def check_if_mill_is_ok(self, piece, position):
+        """ Checks if the mill counts as a new mill
+
+        Keyword arguments:
+        piece -- the pieces who moved
+        position -- the position the piece moved
+        return -- True if the mill counts as a new one
+        """
+        player = self.get_player_from_piece(piece)
+        if player.latest_mill[position] < 3:
+            return False
+        return True
+
+
+    def check_if_tie(self):
+        """"Checks if the total amount of turns has exceeded 200 turns which ends the game in a tie.
+
+        Keyword arguments:
+        return -- True if the game is a tie, otherwise False.
+        """
+        if(self.total_turns < 200):
+            return False
+        else: return True
+
 
     class PlaceResults:
         Failed = -1
@@ -64,7 +117,7 @@ class Game:
         """Places a piece at the given location.
         If the placement was invalid it will return PlaceResults.Failed.
         If the placement resulted in a three it will return PlaceResults.GotThree.
-        Otherwise it will return PlaceResults.Placed.
+        Otherwise it will return PlaceResults.Placed and increase total_turns by 1.
 
         Keyword arguments:
         piece -- the piece to place
@@ -84,6 +137,7 @@ class Game:
             self.eliminating = True
             return self.PlaceResults.GotThree
         self.turn = self.board.get_other_piece(self.turn)
+        self.total_turns = self.total_turns + 1
         return self.PlaceResults.Placed
 
     class CanPlaceResults:
@@ -107,7 +161,7 @@ class Game:
         position -- position on the board where the piece will be placed
         return -- A CanPlaceResults result
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return self.CanPlaceResults.OutsideBoard
         if (self.turn != piece):
             return self.CanPlaceResults.WrongPiece
@@ -130,6 +184,7 @@ class Game:
             return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 
         return True
@@ -152,7 +207,7 @@ class Game:
         Keyword arguments:
         position -- The position to check
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return self.CanElimateResults.OutsideBoard
         if (self.board[position] == Piece.Empty):
             return self.CanElimateResults.NoPiece
@@ -160,7 +215,7 @@ class Game:
             return self.CanElimateResults.WrongPiece
         if (self.eliminating == False):
             return self.CanElimateResults.WrongState
-        
+
         # If all opponent pieces are three, we can elimate anything
         opponent_piece = self.board.get_other_piece(self.turn)
         all_are_threes = True
@@ -173,9 +228,9 @@ class Game:
         if (all_are_threes == False):
             if (self.board.has_three_at_position(opponent_piece, position)):
                 return self.CanElimateResults.TargetAreThrees
-        
+
         return self.CanElimateResults.Ok
-    
+
 
     class MoveResults:
         Ok = 1
@@ -184,7 +239,7 @@ class Game:
     def move_piece(self, position, new_position):
         """Moves a piece from a position to another.
         Returns a MoveResults containing information about the move.
-        Returns Ok if the move was successful.
+        Returns Ok if the move was successful and increase total_turns by 1.
         Returns GotThree if the resulting move resulted in threes.
         Returns Failed if the move was invalid.
 
@@ -196,14 +251,26 @@ class Game:
         if (self.can_move_piece(position, new_position) != self.CanMoveResults.Ok):
             return self.MoveResults.Failed
         piece_at_old_position = self.board[position]
+
+        player = self.get_player_from_piece(piece_at_old_position)
+        if (self.board.has_three_at_position(piece_at_old_position, position)):
+            player.latest_mill[position] = 0
+
+        player.increase_position_move_count()
         self.board[position] = Piece.Empty
         self.board[new_position] = piece_at_old_position
-        
-        if (self.board.has_three_at_position(piece_at_old_position, new_position)):
+
+
+        if (    self.board.has_three_at_position(piece_at_old_position, new_position) and
+                self.check_if_mill_is_ok(piece_at_old_position, new_position)):
+
             self.eliminating = True
+
+
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
+        self.total_turns = self.total_turns + 1
         return self.MoveResults.Ok
 
     class CanMoveResults:
@@ -213,7 +280,7 @@ class Game:
         OutsideBoard = -3
         NotAdjacent = -4
         NewPositionOccupied = -5,
-        WrongState = -6   
+        WrongState = -6
     def can_move_piece_from(self, position, ignore_turn = False):
         """Checks if a piece at a position can be moved from the given position.
         Returns a CanMoveResults containing information about the move.
@@ -227,7 +294,7 @@ class Game:
         ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
         return -- a CanMoveResult result that shows how to implement
         """
-        if (position < 0 or position > 23):
+        if (position < 0 or position >= Board.position_count):
             return Game.CanMoveResults.OutsideBoard
         if (ignore_turn == False and self.turn != self.board[position]):
             return Game.CanMoveResults.WrongPiece
@@ -235,7 +302,7 @@ class Game:
             return Game.CanMoveResults.WrongState
 
         return Game.CanMoveResults.Ok
-        
+
 
     def can_move_piece(self, position, new_position, ignore_turn = False):
         """Checks if a piece at a position can be moved to the given position.
@@ -257,15 +324,15 @@ class Game:
 
         can_move_from_result = self.can_move_piece_from(position, ignore_turn)
         if (can_move_from_result != Game.CanMoveResults.Ok):
-            return can_move_from_result 
+            return can_move_from_result
 
-        if (new_position < 0 or new_position > 23):
+        if (new_position < 0 or new_position > Board.position_count):
             return self.CanMoveResults.OutsideBoard
         if (position == new_position):
             return self.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
             return self.CanMoveResults.NewPositionOccupied
-        
+
         moved_piece = self.board[position]
         total_on_board = self.board.pieces_of_type_on_board(moved_piece)
         # If you have three pieces left you're allowed to fly so the adjacent rule doesn't apply
@@ -285,7 +352,7 @@ class Game:
         return -- a list of positions we can move
         """
         valid_moves = []
-        for i in range(24):
+        for i in range(Board.position_count):
             if (self.can_move_piece(position, i, ignore_turn) == Game.CanMoveResults.Ok):
                 valid_moves.append(i)
         return valid_moves

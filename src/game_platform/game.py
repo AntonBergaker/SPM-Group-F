@@ -21,7 +21,7 @@ class Game:
         self.board = Board()
         self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
-        self.eliminating = 0
+        self.eliminating = False
         self.total_turns = 0
 
     def get_player_from_piece(self, piece):
@@ -356,3 +356,32 @@ class Game:
             if (self.can_move_piece(position, i, ignore_turn) == Game.CanMoveResults.Ok):
                 valid_moves.append(i)
         return valid_moves
+
+
+    def serialize(self):
+
+        players_json = [self.players[0].serialize(), self.players[1].serialize()]
+
+        json = {
+            "board": self.board.serialize(),
+            "turn": Piece.serialize(self.turn),
+            "stage": "placing" if self.state == Game.GameStage.Placing else "moving",
+            "eliminating": self.eliminating,
+            "total_turns": self.total_turns,
+            "players": players_json
+        }
+        return json
+
+    @staticmethod
+    def deserialize(json_object):
+        game = Game()
+        game.board = Board.deserialize(json_object["board"])
+        game.turn = Piece.deserialize(json_object["turn"])
+        game.state = Game.GameStage.Placing if json_object["stage"] == "placing" else Game.GameStage.Moving
+        game.eliminating = json_object["eliminating"]
+        game.total_turns = json_object["total_turns"]
+        game.players[0] = Player.deserialize(json_object["players"][0])
+        game.players[1] = Player.deserialize(json_object["players"][1])
+
+
+        return game

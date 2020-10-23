@@ -1,3 +1,5 @@
+import json
+
 class Piece:
     """A representation of the color of the pieces.
 	A piece is Empty if it has not been assigned a color yet. Otherwise it is Black or White.
@@ -6,6 +8,23 @@ class Piece:
     Empty = 0
     Black = 1
     White = 2
+
+    @staticmethod
+    def serialize(piece):
+        if (piece == Piece.Black):
+            return 'B'
+        if (piece == Piece.White):
+            return 'W'
+        return ' '
+
+    @staticmethod
+    def deserialize(string):
+        if (string == 'B'):
+            return Piece.Black
+        if (string == 'W'):
+            return Piece.White
+        return Piece.Empty
+
 
 class Board:
     """A representation of the board.
@@ -144,3 +163,18 @@ class Board:
         return -- Returns nothing. Sets the given value on the given index on the board.
         """
         self.board[index] = value
+
+    def serialize(self):
+        array = [' '] * Board.position_count
+        for i in range(24):
+            array[i] = Piece.serialize(self.board[i])
+
+        return array
+
+    @staticmethod
+    def deserialize(array):
+        board = Board()
+        for i in range(24):
+            board[i] = Piece.deserialize(array[i])
+                
+        return board

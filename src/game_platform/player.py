@@ -25,3 +25,21 @@ class Player:
         """
         for position in range(Board.position_count):
             self.latest_mill[position] += 1
+
+    def serialize(self):
+        return {
+            "piece": Piece.serialize(self.piece),
+            "pieces_left": self.pieces_amount,
+            "time_since_mills": self.latest_mill
+        }
+
+    @staticmethod
+    def deserialize(json_object):
+        player = Player(json_object["piece"], json_object["pieces_left"])
+
+        mill_array = json_object["time_since_mills"]
+
+        for i in range(Board.position_count):
+            player.latest_mill[i] = mill_array[i]
+
+        return player

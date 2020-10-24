@@ -135,6 +135,7 @@ class Game:
             self.state = self.GameStage.Moving
 
         if (self.board.has_three_at_position(piece, position)):
+            player.latest_created_mill = self.board.get_mill_at_position(piece, position)
             self.eliminating = True
             return self.PlaceResults.GotThree
         self.turn = self.board.get_other_piece(self.turn)
@@ -263,16 +264,17 @@ class Game:
         self.board[new_position] = piece_at_old_position
 
 
-        if (    self.board.has_three_at_position(piece_at_old_position, new_position) and
-                self.check_if_mill_is_ok(piece_at_old_position, new_position)):
-
+        if (self.board.has_three_at_position(piece_at_old_position, new_position)):
+            player.latest_created_mill = self.board.get_mill_at_position(piece_at_old_position, new_position)
             self.eliminating = True
-
-
+            player.latest_move_from = position
+            player.latest_move_to = new_position
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
         self.total_turns = self.total_turns + 1
+        player.latest_move_from = position
+        player.latest_move_to = new_position
         return self.MoveResults.Ok
 
     class CanMoveResults:
@@ -283,6 +285,7 @@ class Game:
         NotAdjacent = -4
         NewPositionOccupied = -5,
         WrongState = -6
+        RecreateBrokenMill = -7
     def can_move_piece_from(self, position, ignore_turn = False):
         """Checks if a piece at a position can be moved from the given position.
         Returns a CanMoveResults containing information about the move.
@@ -317,6 +320,7 @@ class Game:
         Returns NotAdjacent if the two positions are not adjacent and adjacent movements are required.
         Returns NewPositionOccupied if there's already a piece at the target location.
         Returns WrongState if the game is not in a movement state
+        Returns RecreateBrokenMill if the player moves back the same piece to the mill it broke the previous turn.
 
         Keyword arguments:
         position -- the position we move from
@@ -335,6 +339,11 @@ class Game:
             return self.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
             return self.CanMoveResults.NewPositionOccupied
+
+        player = self.get_player_from_piece(self.turn)
+        if (player.latest_move_to == position and player.latest_move_from == new_position and
+            (position in player.latest_created_mill) == True):
+            return self.CanMoveResults.RecreateBrokenMill
 
         moved_piece = self.board[position]
         total_on_board = self.board.pieces_of_type_on_board(moved_piece)

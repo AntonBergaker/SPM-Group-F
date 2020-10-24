@@ -114,21 +114,22 @@ class TestGame(unittest.TestCase):
         # Moves black down
         game.move_piece(0, 3)
 
-        # Waste a turn on white
+        # Move white
         game.move_piece(19, 20)
 
-        # Move black back
-        game.move_piece(3, 0)
+        # Moving back into the mill should be invalid
+        result = game.can_move_piece(3, 0)
+        self.assertEqual(Game.CanMoveResults.OldMillAtPosition, result)
 
-        self.assertEqual(False, game.eliminating)
+        # Move another piece
+        game.move_piece(18, 15)
 
-        # Waste 2 turns
+        # Move white
         game.move_piece(20, 19)
-        game.move_piece(0, 3)
-        game.move_piece(19, 20)
-        game.move_piece(18, 10)
-        game.move_piece(20, 19)
-        
+
+        # Moving now should be valid and start eliminating
+        result = game.can_move_piece(3, 0)
+        self.assertEqual(Game.CanMoveResults.Ok, result)
         game.move_piece(3, 0)
         self.assertEqual(True, game.eliminating)
 

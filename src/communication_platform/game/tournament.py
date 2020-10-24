@@ -1,4 +1,4 @@
-from game.player import Player, AIPlayer, Classification
+from ..game.player import Player, AIPlayer, Classification
 import random
 import math
 

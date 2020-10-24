@@ -2,7 +2,7 @@ import socket
 import queue
 import threading
 import pickle
-from communication.server import PORT, CommunicationMessage, NetworkData
+from .server import PORT, CommunicationMessage, NetworkData
 
 
 class Client:

@@ -1,3 +1,4 @@
-import src.game_platform as game_platform
+from src.menu import Menu
 
-cmd = game_platform.CommandLine()
+menu = Menu()
+menu.menu()

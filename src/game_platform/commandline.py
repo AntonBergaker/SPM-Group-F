@@ -1,6 +1,6 @@
 from .game import Game
 from .board import Piece
-from game_engine import *
+from ..game_engine import *
 from .ai_player import AI_Player
 
 import json
@@ -30,22 +30,6 @@ class CommandLine:
             result = input(prompt)
             if (result == 'q' or result == 'Q'):
                 sys.exit()
-            if result.isdigit():
-                return int(result)
-
-    def input_number_or_other(self, prompt, other):
-        """Checks if the user's given input is an integer or inside other. If the user's input is q or Q the program will exit.
-        It will keep asking the user for an input until it is valid.
-
-        Keyword arguments:
-        prompt -- The message to be printed to the user.
-        other -- Array of other allowed inputs
-        return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
-        """
-        while True:
-            result = input(prompt)
-            if (result == 'q' or result == 'Q'):
-                self.quit()
             if result.isdigit():
                 return int(result)
 

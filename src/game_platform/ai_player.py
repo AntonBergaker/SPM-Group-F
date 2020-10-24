@@ -1,7 +1,6 @@
 from .game import Game
-from .game import *
 from .board import Piece
-from game_engine import *
+from ..game_engine import *
 
 
 import json

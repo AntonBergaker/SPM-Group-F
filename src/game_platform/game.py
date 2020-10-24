@@ -296,6 +296,7 @@ class Game:
         ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
         return -- a CanMoveResult result that shows how to implement
         """
+        print("pos in can move: " + str(position))
         if (position < 0 or position >= Board.position_count):
             return Game.CanMoveResults.OutsideBoard
         if (ignore_turn == False and self.turn != self.board[position]):

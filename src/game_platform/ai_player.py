@@ -66,8 +66,8 @@ class AI_Player:
         elif self.game.state == Game.GameStage.Moving:
             ai_place = self.ai_moves_to()
             ai_move = self.ai_moves_from()
-            self.ai_move(ai_move, ai_place)
-            if (self.ai_eliminating() == True):
+            self.ai_move(self.translator(str(ai_move)), self.translator(str(ai_place)))
+            if self.ai_eliminating():
                 wants_to_eliminate = self.ai_wants_to_eliminate()
                 self.ai_eliminate(self.translator(wants_to_eliminate))
 

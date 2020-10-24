@@ -129,6 +129,7 @@ class Game:
         self.board[position] = piece
         player = self.get_player_from_piece(self.turn)
         player.pieces_amount -= 1
+        player.increase_position_move_count()
 
         if (self.players[0].pieces_amount == 0 and self.players[1].pieces_amount == 0):
             self.state = self.GameStage.Moving

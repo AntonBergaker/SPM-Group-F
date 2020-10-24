@@ -50,8 +50,8 @@ class CommandLine:
 
     def __init__(self):
         """When initialized, it will start the main menu."""
-        self.menu()
         colorama.init(True)
+        self.menu()
 
     def print_board(self):
         """Prints the board and the pieces on the board. It also prints how many pieces each player has.

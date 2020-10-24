@@ -534,7 +534,7 @@ class CommandLine:
                             print("White has won the game")
                             break
                 elif user_input_again == '2':
-                    self.game = Game()
+                    self.game = Game(4)
                     self.ai = AI_Player(self.game)
                     # Makes sure that its a new game_file every new game against the AI.
                     manage_game.delete_game_file()

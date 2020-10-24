@@ -1,11 +1,14 @@
 from .game import Game
 from .board import Piece
+from game_engine import *
+from .ai_player import AI_Player
+
+import json
 import sys
 import os
 import colorama
 
 
-# Taken from https://stackoverflow.com/questions/517970/how-to-clear-the-interpreter-console, clears the console for all platforms
 def clear_screen():
     """Clears the terminal."""
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -17,10 +20,26 @@ class CommandLine:
 
     def input_number(self, prompt):
         """Checks if the user's given input is an integer. If the user's input is q or Q the program will exit.
+          It will keep asking the user for an input until it is valid.
+
+          Keyword arguments:
+          prompt -- The message to be printed to the user.
+          return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
+        """
+        while True:
+            result = input(prompt)
+            if (result == 'q' or result == 'Q'):
+                sys.exit()
+            if result.isdigit():
+                return int(result)
+
+    def input_number_or_other(self, prompt, other):
+        """Checks if the user's given input is an integer or inside other. If the user's input is q or Q the program will exit.
         It will keep asking the user for an input until it is valid.
 
         Keyword arguments:
         prompt -- The message to be printed to the user.
+        other -- Array of other allowed inputs
         return -- Exits the program if the user's input is q or Q. Otherwise the users input if it is an integer.
         """
         while True:
@@ -50,14 +69,14 @@ class CommandLine:
 
     def __init__(self):
         """When initialized, it will start the main menu."""
-        self.menu()
         colorama.init(True)
+        self.menu()
 
     def print_board(self):
         """Prints the board and the pieces on the board. It also prints how many pieces each player has.
 
-        Keyword arguments:
-        return -- Prints out the board.
+          Keyword arguments:
+          return -- Prints out the board.
         """
         board = [""] * 24
 
@@ -137,13 +156,97 @@ class CommandLine:
             pieces_presentation[62 - i] = white_piece
         print("".join(pieces_presentation))
 
+        def print_board_ai(self):
+            """Prints the board and the pieces on the board. It also prints how many pieces each player has.
+
+              Keyword arguments:
+              return -- Prints out the board.
+            """
+            board = [""] * 24
+
+            reset_code = colorama.Style.RESET_ALL + colorama.Style.DIM
+            black_piece = colorama.Fore.MAGENTA + 'B' + reset_code
+            white_piece = colorama.Style.BRIGHT + 'W' + reset_code
+
+            for x in range(24):
+                if (self.game.board[x] == Piece.Empty):
+                    board[x] = ' '
+                elif (self.game.board[x] == Piece.Black):
+                    board[x] = black_piece
+                else:
+                    board[x] = white_piece
+
+            clear_screen()
+
+            board_text = """
+    1                            2                             3
+      A-----------------------------C-----------------------------D
+      |)                            |                           / |
+      |  )                          |                         /   |
+      |    )                        |                       /     |
+      |      ) 4                  5 |                   6 /       |
+      |        E--------------------F--------------------G        |
+      |        | )                  |                 /  |        |
+      |        |   )                |               /    |        |
+      |        |     )              |             /      |        |
+      |        |       ) 7        8 |         9 /        |        |
+      |        |         H----------I----------J         |        |
+      |        |         |                     |         |        |
+      |        |         |                     |         |        |
+    10|     11 |      12 |                  13 |      14 |     15 |
+      K--------L---------M                     N---------O--------P
+      |        |         |                     |         |        |
+      |        |      16 |         17       18 |         |        |
+      |        |         Q----------R----------S         |        |
+      |        |       /            |            )       |        |
+      |        |     /              |              )     |        |
+      |        |   /                |                )   |        |
+      |     19 | /               20 |                  ) | 21     |
+      |        T--------------------U--------------------V        |
+      |      /                      |                      )      |
+      |    /                        |                        )    |
+      |  /                          |                          )  |
+    22|/                         23 |                          24)|
+      X-----------------------------Y-----------------------------Z  """
+
+            # So the preview looks nice, use ] instead of \\ to make the size match
+            board_text = board_text.replace(")", "\\")
+
+            # replace characters with board pieces
+            board_positions = "ACDEFGHIJKLMNOPQRSTUVXYZ"
+
+            # replace in two steps, because color codes include characters that might be replaced otherwise
+            for i in range(24):
+                board_text = board_text.replace(board_positions[i], "pos_" + board_positions[i])
+
+            # replace numbers, also in two steps...
+            for i in range(10):
+                board_text = board_text.replace(str(i), "num_" + str(i))
+
+            for i in range(24):
+                board_text = board_text.replace("pos_" + board_positions[i], board[i])
+
+            for i in range(10):
+                board_text = board_text.replace("num_" + str(i), colorama.Fore.YELLOW + str(i) + reset_code)
+
+            print(board_text)
+
+            # if (self.game.state == Game.GameState.Placing):
+            # print("Pieces left                Black: " + str(self.game.players[0].pieces_amount) + "                White: " + str(self.game.players[1].pieces_amount))
+            pieces_presentation = [' '] * 63
+            for i in range(self.game.players[0].pieces_amount):
+                pieces_presentation[i] = black_piece
+            for i in range(self.game.players[1].pieces_amount):
+                pieces_presentation[62 - i] = white_piece
+            print("".join(pieces_presentation))
+
     def identify_piece(self, turn):
         """ Identifies which player's turn it is.
 
-        Keyword arguments:
-        turn -- The current turn of the game.
-        return -- Returns Black if the given turn is 1 or White if the given turn is 2.
-      """
+          Keyword arguments:
+          turn -- The current turn of the game.
+          return -- Returns Black if the given turn is 1 or White if the given turn is 2.
+        """
         if turn == 1:
             return 'Black'
         if turn == 2:
@@ -165,6 +268,8 @@ class CommandLine:
             result = self.game.can_eliminate_piece(position)
             if result == Game.CanElimateResults.Ok:
                 self.game.eliminate_piece(position)
+                player = self.game.get_player_from_piece(self.game.turn)
+                player.previous_move[2] = position
                 break
             elif result == Game.CanElimateResults.NoPiece:
                 print("No piece at that position.")
@@ -176,6 +281,8 @@ class CommandLine:
                 print("Position is outside the board")
             else:
                 print("Something went wrong")
+
+
 
     def place(self):
         """Ask the user for input on where to place, and then places there.
@@ -190,6 +297,8 @@ class CommandLine:
             result = self.game.can_place_piece(self.game.turn, position)
             if result == Game.CanPlaceResults.Ok:
                 self.game.place_piece(self.game.turn, position)
+                player = self.game.get_player_from_piece(self.game.turn)
+                player.previous_move[1] = position
                 break
             elif result == Game.CanPlaceResults.Occupied:
                 print("There is already something at this position.")
@@ -228,6 +337,9 @@ class CommandLine:
 
             if result == Game.CanMoveResults.Ok:
                 self.game.move_piece(position, new_position)
+                player = self.game.get_player_from_piece(self.game.turn)
+                player.previous_move[0] = position
+                player.previous_move[1] = new_position
                 break
             elif result == Game.CanMoveResults.WrongPiece:
                 print("Can't move opponents/empty piece.")
@@ -244,6 +356,66 @@ class CommandLine:
                 return  # Safety return here. Wrong state means no moving can happen
             else:
                 print("Something went wrong.")
+
+
+    def play(self):
+        """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
+          Depending on the user's input, different messages will be printed out. If the user places a piece on which it creates a mill, the user will be asked which
+          opponent piece it wants to eliminate. If the game state is on s1
+          tate Moving then it will ask the user which one of its pieces it wants to move. Depending on the
+          user's input, different messages will be printed out. If the user moves its piece on another valid position which it creates a mill, the user will be
+          asked which opponent piece it wants to eliminate.
+
+          Keyword arguments:
+          return -- Prints out different messages depending on the user's input and updates the board accordingly.
+        """
+        if self.game.state == Game.GameStage.Placing:
+            self.place()
+            if self.game.eliminating:
+                self.eliminate()
+        elif self.game.state == Game.GameStage.Moving:
+            self.move()
+            if self.game.eliminating:
+                self.eliminate()
+
+
+    def play_against_AI(self, difficulty):
+        """ This function takes in the chosen difficulty level (string) of the
+            AI and plays against the AI. It lets both the AI and the Player play
+            and translates the moves and updates both the boards between the
+            turns. This is the function to call than manage the overall game
+            against the AI.
+        """
+        # Delete save_file
+        # Create save_file
+        # While loop that checks how long we play
+        # Player as Input -> Translate Input -> Save in save_file
+        # AI plays -> Read save_file -> Translate output -> Send it in as Player 2
+        # If phase 1 call moves_to and check if eliminate
+        # If phase 2 call ai_moves_from
+
+        while (True):
+            self.print_board()
+            if (self.game.turn == Piece.Black):
+               self.play()
+            else:
+                self.ai.the_ai_turn(difficulty)
+            result = self.game.get_game_winner()
+
+            if (result == Game.WinnerResults.BlackWon):
+                self.print_board()
+                print("Black has won the game")
+                break
+            if (result == Game.WinnerResults.WhiteWon):
+                self.print_board()
+                print("White has won the game")
+                break
+            if (result == Game.WinnerResults.Tie):
+                self.print_board()
+                print("It's a draw! Max amount of turns is 200")
+                break
+
+
 
     def play(self):
         """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
@@ -361,10 +533,18 @@ class CommandLine:
                             print("White has won the game")
                             break
                 elif user_input_again == '2':
+                    self.game = Game(4)
+                    self.ai = AI_Player(self.game)
+                    # Makes sure that its a new game_file every new game against the AI.
+                    manage_game.delete_game_file()
+                    manage_game.create_game_file()
                     print('This is where we play against the AI')
-                    # remove these when we add stuff
-                    menu_input = input('<- Back to main menu, input 1 and press enter: ')
-                    if menu_input == '1':
+                    difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+                    # Calls on the funciton that mainly manage the game against the AI.
+                    self.play_against_AI(difficulty)
+
+                    menu_input = input('<- Back to main menu, input 3 and press enter: ')
+                    if menu_input == '3':
                         clear_screen()
             elif user_input == '2':
                 clear_screen()

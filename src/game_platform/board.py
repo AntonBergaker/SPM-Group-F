@@ -131,6 +131,26 @@ class Board:
 
         return False
 
+    def get_mill_at_position(self, piece, position):
+        """Returns a line that contains the given position and piece if it is a mill.
+
+        Keyword arguments:
+        piece -- The piece to check if it is in a mill.
+        position -- The position to look for in possible mills.
+        return -- Returns the line that is a mill given the piece and position. Otherwise returns an empty line.
+        """
+        lines = self.get_lines_for_position(position)
+        for line in lines:
+            line_full = True
+            for position in line:
+                if (self.board[position] != piece):
+                    line_full = False
+                    break
+            if (line_full):
+                return line
+
+        return []
+
     def get_other_piece(self, piece):
         """Gets the opposite color of the given piece.
         If the given piece is Piece.Black it will return Piece.White and vice versa. Otherwise it will return Piece.Empty.

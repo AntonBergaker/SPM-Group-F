@@ -21,7 +21,8 @@ class Game:
         self.board = Board()
         self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
-        self.eliminating = False
+        self.eliminating = 0
+        self.ai_eliminated = 0
         self.total_turns = 0
 
     def get_player_from_piece(self, piece):
@@ -56,7 +57,7 @@ class Game:
             return Game.WinnerResults.BlackWon
         if (self.check_if_piece_won_game(Piece.White)):
             return Game.WinnerResults.WhiteWon
-        
+
         return Game.WinnerResults.GameInProgress
 
     def check_if_piece_won_game(self, piece):
@@ -93,7 +94,7 @@ class Game:
         return -- True if the mill counts as a new one
         """
         player = self.get_player_from_piece(piece)
-        if player.latest_mill[position] < 3:
+        if player.latest_mill[position] < 2:
             return False
         return True
 
@@ -129,11 +130,13 @@ class Game:
         self.board[position] = piece
         player = self.get_player_from_piece(self.turn)
         player.pieces_amount -= 1
+        player.increase_position_move_count()
 
         if (self.players[0].pieces_amount == 0 and self.players[1].pieces_amount == 0):
             self.state = self.GameStage.Moving
 
         if (self.board.has_three_at_position(piece, position)):
+            player.latest_created_mill = self.board.get_mill_at_position(piece, position)
             self.eliminating = True
             return self.PlaceResults.GotThree
         self.turn = self.board.get_other_piece(self.turn)
@@ -181,9 +184,10 @@ class Game:
         return -- True if piece on the given position can be eliminated, otherwise False.
         """
         if (self.can_eliminate_piece(position) != self.CanElimateResults.Ok):
-            return False
+           return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.ai_eliminated = True
         self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 
@@ -261,16 +265,16 @@ class Game:
         self.board[new_position] = piece_at_old_position
 
 
-        if (    self.board.has_three_at_position(piece_at_old_position, new_position) and
-                self.check_if_mill_is_ok(piece_at_old_position, new_position)):
-
+        if (self.board.has_three_at_position(piece_at_old_position, new_position)):
             self.eliminating = True
-
-
+            player.latest_move_from = position
+            player.latest_move_to = new_position
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
         self.total_turns = self.total_turns + 1
+        player.latest_move_from = position
+        player.latest_move_to = new_position
         return self.MoveResults.Ok
 
     class CanMoveResults:
@@ -280,7 +284,8 @@ class Game:
         OutsideBoard = -3
         NotAdjacent = -4
         NewPositionOccupied = -5,
-        WrongState = -6
+        OldMillAtPosition = -6,
+        WrongState = -7
     def can_move_piece_from(self, position, ignore_turn = False):
         """Checks if a piece at a position can be moved from the given position.
         Returns a CanMoveResults containing information about the move.
@@ -294,6 +299,7 @@ class Game:
         ignore_turn -- optional argument, defaults to False. If true it will ignore the turn check
         return -- a CanMoveResult result that shows how to implement
         """
+        print("pos in can move: " + str(position))
         if (position < 0 or position >= Board.position_count):
             return Game.CanMoveResults.OutsideBoard
         if (ignore_turn == False and self.turn != self.board[position]):
@@ -314,6 +320,7 @@ class Game:
         Returns NotAdjacent if the two positions are not adjacent and adjacent movements are required.
         Returns NewPositionOccupied if there's already a piece at the target location.
         Returns WrongState if the game is not in a movement state
+        Returns RecreateBrokenMill if the player moves back the same piece to the mill it broke the previous turn.
 
         Keyword arguments:
         position -- the position we move from
@@ -325,22 +332,26 @@ class Game:
         can_move_from_result = self.can_move_piece_from(position, ignore_turn)
         if (can_move_from_result != Game.CanMoveResults.Ok):
             return can_move_from_result
-
         if (new_position < 0 or new_position > Board.position_count):
-            return self.CanMoveResults.OutsideBoard
+            return Game.CanMoveResults.OutsideBoard
         if (position == new_position):
-            return self.CanMoveResults.SamePosition
+            return Game.CanMoveResults.SamePosition
         if (self.board[new_position] != Piece.Empty):
-            return self.CanMoveResults.NewPositionOccupied
+            return Game.CanMoveResults.NewPositionOccupied
+        if (self.check_if_mill_is_ok(self.board[position], new_position) == False):
+            return Game.CanMoveResults.OldMillAtPosition
+
+        
+
 
         moved_piece = self.board[position]
         total_on_board = self.board.pieces_of_type_on_board(moved_piece)
         # If you have three pieces left you're allowed to fly so the adjacent rule doesn't apply
         if (total_on_board > 3):
             if (self.board.positions_are_adjacent(position, new_position) == False):
-                return self.CanMoveResults.NotAdjacent
+                return Game.CanMoveResults.NotAdjacent
 
-        return self.CanMoveResults.Ok
+        return Game.CanMoveResults.Ok
 
 
     def get_valid_moves_from_position(self, position, ignore_turn = False):

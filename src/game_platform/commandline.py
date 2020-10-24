@@ -358,13 +358,6 @@ class CommandLine:
             else:
                 print("Something went wrong.")
 
-    #def ai_move(self, ai_position_from, ai_position_to):
-        #""" Takes the translated AIs positions (ints) on where the AI moved from
-        #    and where the AI moved to and moves the piece on the players board.
-        #"""
-        #old_position = ai_position_from
-        #new_position = ai_position_to
-        #self.game.move_piece(old_position, new_position)
 
     def play(self):
         """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
@@ -424,116 +417,6 @@ class CommandLine:
                 break
 
 
-    def menu(self):
-        """Prints out the menu and gets the user's input.
-          If the input is 1, it will create and start the game. It will check after every turn if any player has won. If a player has won, it will print who won and the menu again.
-          If the input is 2, it will describe how to play the game.
-          If the input is 3, it will quit the program.
-
-          Keyword arguments:
-          return -- Prints out the menu which the user can choose from.
-        """
-        while True:
-            print('### UU-GAME ###')
-            print('1. Play Local')
-            print('2. Play Online')
-            print('3. How to play')
-            print('4. Quit')
-
-            user_input = input('Please enter your choice from the menu and press enter: ')
-            if user_input == '1':
-                print('### LOCAL-GAME ###')
-                print('1. Player 1 vs Player 2')
-                print('2. Player 1 vs Computer')
-                user_input_again = input('Please enter your choice from the menu and press enter: ')
-                if user_input_again == '1':
-                    self.game = Game()
-                    while (True):
-
-                        self.print_board()
-                        self.play()
-
-                        result = self.game.get_game_winner()
-
-                        if (result == Game.WinnerResults.BlackWon):
-                            self.print_board()
-                            print("Black has won the game")
-                            break
-                        if (result == Game.WinnerResults.WhiteWon):
-                            self.print_board()
-                            print("White has won the game")
-                            break
-                        if (result == Game.WinnerResults.Tie):
-                            self.print_board()
-                            print("It's a draw! Max amount of turns is 200")
-                            break
-                elif user_input_again == '2':
-                    self.game = Game(4)
-                    self.ai = AI_Player(self.game)
-                    #Makes sure that its a new game_file every new game against the AI.
-                    manage_game.delete_game_file()
-                    manage_game.create_game_file()
-                    print('This is where we play against the AI')
-                    difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
-                    #Calls on the funciton that mainly manage the game against the AI.
-                    self.play_against_AI(difficulty)
-
-                    menu_input = input('<- Back to main menu, input 3 and press enter: ')
-
-                    if menu_input == '3':
-                        clear_screen()
-
-            elif user_input == '2':
-                print('This is where we play Online')
-                # remove these when we add stuff
-                menu_input = input('<- Back to main menu, input 1 and press enter: ')
-                if menu_input == '1':
-                    clear_screen()
-            elif user_input == '3':
-                clear_screen()
-                self.game = Game()
-                self.print_board()
-                howto_text = f"""
-          This is preview of the board.
-          Black players pieces are denoted by {colorama.Fore.MAGENTA}B{colorama.Style.RESET_ALL} and white players pieces are denoted by {colorama.Style.BRIGHT}W{colorama.Style.RESET_ALL}.
-          The pieces you have not placed yet are represented below the board.
-
-          * Both players in the game will have twelve pieces each and have twenty four places to place on the board.
-          * The player who starts first will always be black.
-          * The board starts empty and each player will have to place their pieces on the board taking turns.
-          * You can take your opponents piece out of the board if you have a three in a row.
-          * Three in a row can be done horizontally, vertically or even diagonally.
-          * Once all the pieces are placed on the board, each player can move their pieces to adjacent empty places along the lines.
-          * When a player has three pieces left on the board, the player can move their pieces to any empty place on the board.
-
-          A player will win the game if you satisfy any of these two conditions
-          1. When their opponent’s pieces are reduced to less than three.
-          2. If you can surround your opponent’s pieces making them unable to move or match three in a row.
-
-          The game will end in a draw when the total amount of turns reaches 200.
-          """
-                continue
-
-            if result == Game.CanMoveResults.Ok:
-                self.game.move_piece(position, new_position)
-                break
-            elif result == Game.CanMoveResults.WrongPiece:
-                print("Can't move opponents/empty piece.")
-            elif result == Game.CanMoveResults.SamePosition:
-                print("Can't move to same position")
-            elif result == Game.CanMoveResults.OutsideBoard:
-                print("Position is outside the board.")
-            elif result == Game.CanMoveResults.NotAdjacent:
-                print("The positions are not nearby.")
-            elif result == Game.CanMoveResults.NewPositionOccupied:
-                print("The new position is occupied.")
-            elif result == Game.CanMoveResults.RecreateBrokenMill:
-                print("Can't move back the piece to recreate the mill that broke it in the previous turn.")
-            elif result == Game.CanMoveResults.WrongState:
-                print("Moving pieces are not allowed at this time (this shouldn't be possible to happen).")
-                return # Safety return here. Wrong state means no moving can happen
-            else:
-                print("Something went wrong.")
 
     def play(self):
         """It checks first which game state the game is in. If the game state is on state Placing then it will ask the user which position it wants to place its piece.
@@ -651,10 +534,18 @@ class CommandLine:
                             print("White has won the game")
                             break
                 elif user_input_again == '2':
+                    self.game = Game()
+                    self.ai = AI_Player(self.game)
+                    # Makes sure that its a new game_file every new game against the AI.
+                    manage_game.delete_game_file()
+                    manage_game.create_game_file()
                     print('This is where we play against the AI')
-                    # remove these when we add stuff
-                    menu_input = input('<- Back to main menu, input 1 and press enter: ')
-                    if menu_input == '1':
+                    difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+                    # Calls on the funciton that mainly manage the game against the AI.
+                    self.play_against_AI(difficulty)
+
+                    menu_input = input('<- Back to main menu, input 3 and press enter: ')
+                    if menu_input == '3':
                         clear_screen()
             elif user_input == '2':
                 clear_screen()

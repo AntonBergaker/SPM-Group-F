@@ -2,7 +2,6 @@ import os
 from .game_platform import Game, CommandLine, Piece
 from .game_platform.ai_player import AI_Player
 from .communication_platform.communicator import Communicator
-from .game_engine import *
 from .utils import *
 
 import colorama
@@ -55,14 +54,15 @@ class Menu:
                             print("White has won the game")
                             break
                 elif user_input_again == '2':
-                    game = Game(4)
+                    game = Game()
                     cmd = CommandLine(game)
                     self.ai = AI_Player(game)
                     # Makes sure that its a new game_file every new game against the AI.
-                    manage_game.delete_game_file()
-                    manage_game.create_game_file()
                     print('This is where we play against the AI')
-                    difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+                    difficulty = "-1"
+                    while difficulty not in ["0", "1", "2"]:
+                        difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
+                        
                     # Calls on the funciton that mainly manage the game against the AI.
                     self.play_against_AI(cmd, difficulty)
 

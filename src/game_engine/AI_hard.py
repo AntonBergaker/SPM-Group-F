@@ -60,8 +60,6 @@ def make_move(gamestate, chosen_node, phase, real):
         else:
             gamestate.AI.previous_move[2] = False
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
-            if(real):
-                print('AI created a three in a row')
 
             # If we find one, remove an opponent piece.
             removed = remove_opponent_piece(gamestate, real)
@@ -89,8 +87,6 @@ def make_move(gamestate, chosen_node, phase, real):
                 change_owner(gamestate, node_to, AI)
                 # Checking.
                 if (check_three_in_a_row(gamestate, node_to, AI)):
-                    if (real):
-                        print('AI created a three in a row')
                     removed = remove_opponent_piece(gamestate, real)
                 return True, removed
             else:
@@ -246,7 +242,7 @@ def remove_opponent_piece(gamestate, real):
             nodes_checked += 1
             chosen_node = choice(opponent_nodes)
         if (real):
-            print(f"REMOVING PLAYER PIECE AT: {chosen_node}")
+            pass
         for line in gamestate.gameboard.lines:
             for node in line.nodes:
                 if ((node.get_node_label() == chosen_node.get_node_label()) and (node.owner == PLAYER)):
@@ -334,12 +330,10 @@ def winning_check(gamestate, target):
     if(target == AI):
         if (gamestate.player.markers_left_to_play == 0):
             if (gamestate.player.markers_on_board <= 2):
-                print(f'PLAYER markers: {gamestate.player.markers_on_board}')
                 return True
     elif(target == PLAYER):
         if (gamestate.AI.markers_left_to_play == 0):
             if (gamestate.AI.markers_on_board <= 2):
-                print(f'AI markers: {gamestate.AI.markers_on_board}')
                 return True
     return False
 
@@ -597,7 +591,6 @@ def run_game_hard(data):
     data = load_save_file()
     gamestate = Gamestate(data)
 
-    print(gamestate)
 
     update_markers_on_board_numbers(gamestate)
 
@@ -619,13 +612,11 @@ def run_game_hard(data):
 
     # Checking if in phase 1 of the game.
     if (gamestate.AI.markers_left_to_play > 0):
-        print('Phase 1 move')
         possible_nodes = get_possible_nodes(gamestate, EMPTY)
         if (len(get_possible_nodes(gamestate, EMPTY)) > 9):
             chosen_place, max_score = minmax(True, gamestate, 1, 3, -inf, inf)
         else:
             chosen_place, max_score = minmax(True, gamestate, 1, 4, -inf, inf)
-        print(f'chosen move: {chosen_place}')
 
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1, True)
@@ -637,7 +628,6 @@ def run_game_hard(data):
     # Checking if in phase 2 of the game.
     elif (gamestate.AI.markers_left_to_play == 0 and (gamestate.AI.markers_on_board > 3)):
         # Phase 2!
-        print('Phase 2 move')
         possible_nodes = get_possible_nodes(gamestate, AI)
         neighbours = get_neighbours(gamestate, possible_nodes)
 
@@ -657,27 +647,22 @@ def run_game_hard(data):
 
                 moved, removed = make_move(gamestate, chosen_move, 2, True)
                 for node_from, node_to in chosen_move.items():
-                    print(f'from: {node_from} to: {node_to}')
                     chosen_move_labels = {node_from.get_node_label() : node_to.get_node_label()}
                 chosen_place_label = None
         else:
-            print('you lose')
+            pass
 
     # Checking if in phase 3 of the game.
     elif(gamestate.AI.markers_left_to_play == 0 and gamestate.AI.markers_on_board == 3):
-        print (gamestate.AI.markers_on_board)
-        print('Phase 3 move')
 
         chosen_move, max_score = minmax(True, gamestate, 3, 3, -inf, inf)
 
         _, removed = make_move(gamestate, chosen_move, 3, True)
         for node_from, node_to in chosen_move.items():
-                    print(f'from: {node_from} to: {node_to}')
                     chosen_move_labels = {node_from.get_node_label() : node_to.get_node_label()}
         chosen_place_label = None
 
     save_save_file(gamestate.to_json())
-    print(gamestate)
 
     if (winning_check(gamestate, AI)):
         status = -1
@@ -685,7 +670,6 @@ def run_game_hard(data):
         status = 1
     else:
         status = 0
-    print(f'chosen_move: {chosen_move_labels}')
     response = {
                 'status': status, 'gamestateJSON': gamestate.to_json(),
                 'place': chosen_place_label,

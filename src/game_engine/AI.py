@@ -34,7 +34,6 @@ def make_move(gamestate, chosen_node, phase):
         else:
             gamestate.AI.previous_move[2] = False
         if (check_three_in_a_row(gamestate, chosen_node, AI)):
-            print('AI created a three in a row')
 
             removed = remove_opponent_piece(gamestate)
 
@@ -57,7 +56,6 @@ def make_move(gamestate, chosen_node, phase):
                     gamestate.AI.previous_move[2] = False
 
                 if (check_three_in_a_row(gamestate, node_to, AI)):
-                    print('AI created a three in a row')
                     removed = remove_opponent_piece(gamestate)
 
                 return True, removed
@@ -168,7 +166,6 @@ def remove_opponent_piece(gamestate):
                     node.owner = EMPTY
                     gamestate.player.markers_on_board -= 1
                     gamestate.AI.previous_move[3] = node.get_node_label()
-                    print(f"REMOVING PLAYER PIECE AT: {chosen_node}")
                     return node.get_node_label()
     else:
         return None
@@ -258,7 +255,6 @@ def run_game_easy(data):
 
     data = load_save_file()
     gamestate = Gamestate(data)
-    print(gamestate)
 
     update_markers_on_board_numbers(gamestate)
 
@@ -284,7 +280,6 @@ def run_game_easy(data):
 
         # Chosing randomly where to place next piece.
         chosen_place = choice(possible_nodes)
-        print(f'Placing ai marker at: {chosen_place} ')
 
         # Placing.
         _, removed = make_move(gamestate, chosen_place, 1)
@@ -309,16 +304,14 @@ def run_game_easy(data):
                 chosen_move = choice(possible_neighbours)
                 moved, removed = make_move(gamestate, chosen_move, 2)
                 for node_from, node_to in chosen_move.items():
-                    print(f'from: {node_from} to: {node_to}')
                     chosen_move_labels = {node_from.get_node_label() : node_to.get_node_label()}
                 chosen_place_label = None
         else:
-            print('AI cannot move anywhere. Player won!')
+            pass
 
     elif(gamestate.AI.markers_on_board <= 3):
         # Phase 3!
         if(gamestate.AI.markers_on_board <= 2):
-            print("Ai only has 2 pieces left. Player won!!")
             exit()
         moveable_nodes = get_possible_nodes(gamestate, AI)
         placeable_nodes = get_possible_nodes(gamestate, EMPTY)
@@ -330,12 +323,9 @@ def run_game_easy(data):
             chosen_move = {move : place}
             moved, removed = make_move(gamestate, chosen_move, 3)
             for node_from, node_to in chosen_move.items():
-                    print(f'from: {node_from} to: {node_to}')
                     chosen_move_labels = {node_from.get_node_label() : node_to.get_node_label()}
             chosen_place_label = None
 
-
-    print(gamestate)
     save_save_file(gamestate.to_json())
 
     if (winning_check(gamestate, AI)):

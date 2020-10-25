@@ -1,5 +1,5 @@
 from .game import Game
-from .board import Piece
+from .board import Board, Piece
 from ..game_engine import *
 
 
@@ -19,7 +19,6 @@ class AI_Player:
             to eliminate and eliminate the piece on the players board.
         """
         position = eliminate_position
-        print("Position_ai: " + str(position))
         self.game.eliminate_piece(position)
         self.game.eliminating = 0
 
@@ -29,7 +28,6 @@ class AI_Player:
         """
         while True:
             position = ai_position
-            print("Pos " + str(position))
             self.game.place_piece(self.game.turn, position)
             break
 
@@ -39,8 +37,6 @@ class AI_Player:
         """
         old_position = ai_position_from
         new_position = ai_position_to
-        print("old pos:" + str(old_position))
-        print("new pos:" + str(new_position))
         self.game.move_piece(old_position, new_position)
 
     def ai_eliminating(self):
@@ -49,7 +45,6 @@ class AI_Player:
         with open('save_file.json', "r") as f:
             data = json.load(f)
             eliminate_state = data["data"]["ai_previous_move"][2]
-            print("Eli - state: " + str(eliminate_state))
             f.close()
             return eliminate_state
 
@@ -62,7 +57,6 @@ class AI_Player:
 
         if self.game.state == Game.GameStage.Placing:
             ai_place = self.ai_moves_to()
-            print("Tjabba: " + str(ai_place))
             self.ai_place(self.translator(str(ai_place)))
             if (self.ai_eliminating() == True):
                 wants_to_eliminate = self.ai_wants_to_eliminate()
@@ -83,7 +77,6 @@ class AI_Player:
             The positions corresponding on the players board are retuned as int
             and the positions corresponding on the AIs board are returned as strings.
         """
-        print("in_trans :" + str(position) )
         if position == 'a1':
             return 21
         if position == 'a4':
@@ -215,7 +208,6 @@ class AI_Player:
         with open('save_file.json', "r") as f:
             data = json.load(f)
             ai_eliminate_piece = data["data"]["ai_previous_move"][3]
-            print("AI_eli_piece: "+ str(ai_eliminate_piece))
             f.close()
             return ai_eliminate_piece
 
@@ -260,8 +252,6 @@ class AI_Player:
         if self.game.state == Game.GameStage.Placing:
             move_to = player.previous_move[1]
             t_move_to = self.translator(str(move_to))
-            print("T MOVE TO: " + str(t_move_to))
-            print("MOVE TO: " + str(move_to))
             self.write_to_save_file(t_move_to, "X")
             self.write_previous_move(t_move_to, 1)
             #self.decrease_markers_left()
@@ -269,7 +259,6 @@ class AI_Player:
             if self.game.ai_eliminated:
                 eliminate = player.previous_move[2]
                 t_eliminate = self.translator(str(eliminate))
-                print("T-el" + t_eliminate)
                 self.write_to_save_file(t_eliminate, "-")
                 self.write_previous_move(True, 2)
                 self.game.ai_eliminated = False
@@ -289,7 +278,6 @@ class AI_Player:
             if self.game.ai_eliminated:
                 eliminate = player.previous_move[2]
                 t_eliminate = self.translator(str(eliminate))
-                print("T-el" + t_eliminate)
                 self.write_to_save_file(t_eliminate, "-")
                 self.write_previous_move(True, 2)
                 self.game.ai_eliminated = False
@@ -306,9 +294,7 @@ class AI_Player:
             the AIs piece on position 0 (the player sees that as position 1).
         """
         data = None
-        print(position)
         node = str(position[0]) + "_nodes"
-        print(node)
         with open('save_file.json', "r") as f:
             data = json.load(f)
             f.close()

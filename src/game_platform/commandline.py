@@ -29,7 +29,7 @@ class CommandLine:
         while True:
             result = input(prompt)
             if (result == 'q' or result == 'Q'):
-                sys.exit()
+                self.quit()
             if result.isdigit():
                 return int(result)
 
@@ -396,22 +396,27 @@ class CommandLine:
 
         while (True):
             self.print_board()
+            self.info()
             if (self.game.turn == Piece.Black):
                self.play()
+               self.print_board()
             else:
                 self.ai.the_ai_turn(difficulty)
             result = self.game.get_game_winner()
 
             if (result == Game.WinnerResults.BlackWon):
                 self.print_board()
+                self.info()
                 print("Black has won the game")
                 break
             if (result == Game.WinnerResults.WhiteWon):
                 self.print_board()
+                self.info()
                 print("White has won the game")
                 break
             if (result == Game.WinnerResults.Tie):
                 self.print_board()
+                self.info()
                 print("It's a draw! Max amount of turns is 200")
                 break
 
@@ -511,41 +516,52 @@ class CommandLine:
 
             user_input = input('Please enter your choice from the menu and press enter: ')
             if user_input == '1':
-                clear_screen()
-                print('### LOCAL-GAME ###')
-                print('1. Player 1 vs Player 2')
-                print('2. Player 1 vs Computer')
-                user_input_again = input('Please enter your choice from the menu and press enter: ')
-                if user_input_again == '1':
-                    self.game = Game()
-                    while (True):
+                while True:
+                    clear_screen()
+                    print("###   UU-GAME  ###")
+                    print('### LOCAL-GAME ###')
+                    print('1. Player 1 vs Player 2')
+                    print('2. Player 1 vs Computer')
+                    print("3. Back to Main Menu")
+                    user_input_again = input('Please enter your choice from the menu and press enter: ')
+                    clear_screen()
 
-                        self.print_board()
-                        self.info()
-                        self.play()
-
-                        if (self.game.check_if_piece_won_game(Piece.Black)):
+                    if user_input_again == '1':
+                        self.game = Game()
+                        while True:
                             self.print_board()
-                            print("Black has won the game")
-                            break
-                        if (self.game.check_if_piece_won_game(Piece.White)):
-                            self.print_board()
-                            print("White has won the game")
-                            break
-                elif user_input_again == '2':
-                    self.game = Game(4)
-                    self.ai = AI_Player(self.game)
-                    # Makes sure that its a new game_file every new game against the AI.
-                    manage_game.delete_game_file()
-                    manage_game.create_game_file()
-                    print('This is where we play against the AI')
-                    difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2): ")
-                    # Calls on the funciton that mainly manage the game against the AI.
-                    self.play_against_AI(difficulty)
+                            self.info()
+                            self.play()
 
-                    menu_input = input('<- Back to main menu, input 3 and press enter: ')
-                    if menu_input == '3':
-                        clear_screen()
+                            if (self.game.check_if_piece_won_game(Piece.Black)):
+                                self.print_board()
+                                print("Black has won the game")
+                                break
+                            if (self.game.check_if_piece_won_game(Piece.White)):
+                                self.print_board()
+                                print("White has won the game")
+                                break
+                    elif user_input_again == '2':
+                        self.game = Game()
+                        self.ai = AI_Player(self.game)
+                        # Makes sure that its a new game_file every new game against the AI.
+                        print("###       UU-GAME      ###")
+                        print("### Player VS Computer ###")
+                        alternatives = ["0", "1", "2"]
+                        while True:
+                            difficulty = input("Choose difficulty level (Easy - 0, Medium - 1, Hard - 2) or input [M] "
+                                               "to get back to main menu: ")
+                            if difficulty == "0" or difficulty == "1" or difficulty == "2" in alternatives:
+                                self.play_against_AI(difficulty)
+                                break
+                            elif difficulty == "M" or difficulty == "m":
+                                self.menu()
+                                break
+                            elif difficulty not in alternatives:
+                                print("Wrong input! Please choose one of the alternatives given.")
+                    elif user_input_again == '3':
+                        self.menu()
+                        break
             elif user_input == '2':
                 clear_screen()
                 print('This is where we play Online')

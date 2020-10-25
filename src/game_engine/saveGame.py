@@ -22,11 +22,11 @@ def create_save_file():
                 'e_nodes' : e_nodes, 'f_nodes' : f_nodes,'g_nodes' : g_nodes}
         data = {
             'data': {'ai_marker' : 'O',
-            'ai_markers_left' : 4,
+            'ai_markers_left' : 12,
             'ai_markers_on_board' : 0,
             'ai_previous_move' : [None, None, False, None],
             'player_marker' : 'X',
-            'player_markers_left' : 4,
+            'player_markers_left' : 12,
             'player_markers_on_board' : 0,
             'player_previous_move': [None, None, None],}, #[Node moves from, node moved to, if moved from a three in a row (true or false)]
             

@@ -22,7 +22,7 @@ class CommandLine:
         while True:
             result = input(prompt)
             if (result == 'q' or result == 'Q'):
-                sys.exit()
+                self.quit()
             if result.isdigit():
                 return int(result)
 

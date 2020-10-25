@@ -11,7 +11,8 @@ import colorama
 class AI_Player:
     def __init__(self, game):
         self.game = game
-
+        manage_game.delete_game_file()
+        manage_game.create_game_file()
 
     def ai_eliminate(self, eliminate_position):
         """ Takes the translated AIs position (int) of the piece the AI wanted
@@ -20,6 +21,7 @@ class AI_Player:
         position = eliminate_position
         print("Position_ai: " + str(position))
         self.game.eliminate_piece(position)
+        self.game.eliminating = 0
 
     def ai_place(self, ai_position):
         """ Takes the translated AIs position (int) to the piece the AI places and
@@ -37,6 +39,8 @@ class AI_Player:
         """
         old_position = ai_position_from
         new_position = ai_position_to
+        print("old pos:" + str(old_position))
+        print("new pos:" + str(new_position))
         self.game.move_piece(old_position, new_position)
 
     def ai_eliminating(self):
@@ -46,6 +50,7 @@ class AI_Player:
             data = json.load(f)
             eliminate_state = data["data"]["ai_previous_move"][2]
             print("Eli - state: " + str(eliminate_state))
+            f.close()
             return eliminate_state
 
     def ai_play(self):
@@ -62,6 +67,7 @@ class AI_Player:
             if (self.ai_eliminating() == True):
                 wants_to_eliminate = self.ai_wants_to_eliminate()
                 self.ai_eliminate(self.translator(wants_to_eliminate))
+                #self.ai_eliminate_false()
         elif self.game.state == Game.GameStage.Moving:
             ai_place = self.ai_moves_to()
             ai_move = self.ai_moves_from()
@@ -69,6 +75,7 @@ class AI_Player:
             if self.ai_eliminating():
                 wants_to_eliminate = self.ai_wants_to_eliminate()
                 self.ai_eliminate(self.translator(wants_to_eliminate))
+                #self.ai_eliminate_false()
 
     def translator(self, position):
         """ This function takes a position (string) and returnes the corresponding
@@ -184,6 +191,7 @@ class AI_Player:
         with open('save_file.json', "r") as f:
             data = json.load(f)
             ai_move = data["data"]["ai_previous_move"][1]
+            f.close()
             return ai_move
 
     def ai_moves_from(self):
@@ -195,6 +203,7 @@ class AI_Player:
         with open('save_file.json', "r") as f:
             data = json.load(f)
             ai_move = data["data"]["ai_previous_move"][0]
+            f.close()
             return ai_move
 
     def ai_wants_to_eliminate(self):
@@ -206,30 +215,66 @@ class AI_Player:
         with open('save_file.json', "r") as f:
             data = json.load(f)
             ai_eliminate_piece = data["data"]["ai_previous_move"][3]
-            print("AI_eli_piece"+ai_eliminate_piece)
+            print("AI_eli_piece: "+ str(ai_eliminate_piece))
+            f.close()
             return ai_eliminate_piece
 
     def player_to_ai_board(self):
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            f.close()
+
+        data["data"]["ai_markers_left"] = self.game.players[1].pieces_amount
+        data["data"]["ai_markers_on_board"] = self.game.board.pieces_of_type_on_board(Piece.White)
+
+        data["data"]["player_markers_left"] = self.game.players[0].pieces_amount
+        data["data"]["player_markers_on_board"] = self.game.board.pieces_of_type_on_board(Piece.Black)
+
+        for i in range(Board.position_count):
+            position = self.translator(str(i))
+            node = str(position[0]) + "_nodes"
+            
+            marker = '-'
+            piece = self.game.board[i]
+            if (piece == Piece.Black):
+                marker = 'X'
+            elif (piece == Piece.White):
+                marker = 'O'
+
+            data["map"][node][position] = marker
+
+        with open('save_file.json', "w") as f:
+            json.dump(data, f)
+            f.close()
+
+    def player_to_ai_board_old(self):
         """ This function implements the changes on the players board on to
             the AIs board as well. This is the function to call after the
             players turn.
         """
         data = None
         player = self.game.get_player_from_piece(self.game.turn)
-        if self.game.ai_eliminated:
-            eliminate = player.previous_move[2]
-            t_eliminate = self.translator(str(eliminate))
-            print("T-el" + t_eliminate)
-            self.write_to_save_file(t_eliminate, "-")
-            self.game.ai_eliminated = False
 
-        elif self.game.state == Game.GameStage.Placing:
+
+
+        if self.game.state == Game.GameStage.Placing:
             move_to = player.previous_move[1]
             t_move_to = self.translator(str(move_to))
-            print(t_move_to)
-            print(move_to)
+            print("T MOVE TO: " + str(t_move_to))
+            print("MOVE TO: " + str(move_to))
             self.write_to_save_file(t_move_to, "X")
+            self.write_previous_move(t_move_to, 1)
             #self.decrease_markers_left()
+
+            if self.game.ai_eliminated:
+                eliminate = player.previous_move[2]
+                t_eliminate = self.translator(str(eliminate))
+                print("T-el" + t_eliminate)
+                self.write_to_save_file(t_eliminate, "-")
+                self.write_previous_move(True, 2)
+                self.game.ai_eliminated = False
+            else:
+                self.write_previous_move(False, 2)
 
         elif self.game.state == Game.GameStage.Moving:
             move_from = player.previous_move[0]
@@ -238,6 +283,19 @@ class AI_Player:
             t_move_to = self.translator(str(move_to))
             self.write_to_save_file(t_move_from, "-")
             self.write_to_save_file(t_move_to, "X")
+            self.write_previous_move(t_move_from, 0)
+            self.write_previous_move(t_move_to, 1)
+
+            if self.game.ai_eliminated:
+                eliminate = player.previous_move[2]
+                t_eliminate = self.translator(str(eliminate))
+                print("T-el" + t_eliminate)
+                self.write_to_save_file(t_eliminate, "-")
+                self.write_previous_move(True, 2)
+                self.game.ai_eliminated = False
+            else:
+                self.write_previous_move(False, 2)
+
 
     def write_to_save_file(self, position, type):
         """ This function takes the transladet position (string) that should get
@@ -258,6 +316,27 @@ class AI_Player:
             data["map"][node][position] = str(type)
             json.dump(data, f)
             f.close()
+
+    def write_previous_move(self, position, index):
+        data = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            f.close()
+        with open('save_file.json', "w") as f:
+            data["data"]["player_previous_move"][index] = position
+            json.dump(data, f)
+            f.close()
+
+    def ai_eliminate_false(self):
+        data = None
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            f.close()
+        with open('save_file.json', "w") as f:
+            data["data"]["ai_previous_move"][2] = False
+            json.dump(data, f)
+            f.close()
+
 
     def the_ai_turn(self, difficulty):
         self.player_to_ai_board()

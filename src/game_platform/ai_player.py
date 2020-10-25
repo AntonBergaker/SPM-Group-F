@@ -221,6 +221,34 @@ class AI_Player:
             return ai_eliminate_piece
 
     def player_to_ai_board(self):
+        with open('save_file.json', "r") as f:
+            data = json.load(f)
+            f.close()
+
+        data["data"]["ai_markers_left"] = self.game.players[1].pieces_amount
+        data["data"]["ai_markers_on_board"] = self.game.board.pieces_of_type_on_board(Piece.White)
+
+        data["data"]["player_markers_left"] = self.game.players[0].pieces_amount
+        data["data"]["player_markers_on_board"] = self.game.board.pieces_of_type_on_board(Piece.Black)
+
+        for i in range(Board.position_count):
+            position = self.translator(str(i))
+            node = str(position[0]) + "_nodes"
+            
+            marker = '-'
+            piece = self.game.board[i]
+            if (piece == Piece.Black):
+                marker = 'X'
+            elif (piece == Piece.White):
+                marker = 'O'
+
+            data["map"][node][position] = marker
+
+        with open('save_file.json', "w") as f:
+            json.dump(data, f)
+            f.close()
+
+    def player_to_ai_board_old(self):
         """ This function implements the changes on the players board on to
             the AIs board as well. This is the function to call after the
             players turn.

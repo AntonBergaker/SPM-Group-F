@@ -22,6 +22,7 @@ class Game:
         self.players = [Player(Piece.Black, player_piece_count), Player(Piece.White, player_piece_count)]
         self.state = Game.GameStage.Placing
         self.eliminating = 0
+        self.ai_eliminated = 0
         self.total_turns = 0
 
     def get_player_from_piece(self, piece):
@@ -56,7 +57,7 @@ class Game:
             return Game.WinnerResults.BlackWon
         if (self.check_if_piece_won_game(Piece.White)):
             return Game.WinnerResults.WhiteWon
-        
+
         return Game.WinnerResults.GameInProgress
 
     def check_if_piece_won_game(self, piece):
@@ -135,6 +136,7 @@ class Game:
             self.state = self.GameStage.Moving
 
         if (self.board.has_three_at_position(piece, position)):
+            player.latest_created_mill = self.board.get_mill_at_position(piece, position)
             self.eliminating = True
             return self.PlaceResults.GotThree
         self.turn = self.board.get_other_piece(self.turn)
@@ -182,9 +184,10 @@ class Game:
         return -- True if piece on the given position can be eliminated, otherwise False.
         """
         if (self.can_eliminate_piece(position) != self.CanElimateResults.Ok):
-            return False
+           return False
         self.board[position] = Piece.Empty
         self.eliminating = False
+        self.ai_eliminated = True
         self.total_turns = self.total_turns + 1
         self.turn = self.board.get_other_piece(self.turn)
 
@@ -263,14 +266,15 @@ class Game:
 
 
         if (self.board.has_three_at_position(piece_at_old_position, new_position)):
-
             self.eliminating = True
-
-
+            player.latest_move_from = position
+            player.latest_move_to = new_position
             return self.MoveResults.GotThree
 
         self.turn = self.board.get_other_piece(self.turn)
         self.total_turns = self.total_turns + 1
+        player.latest_move_from = position
+        player.latest_move_to = new_position
         return self.MoveResults.Ok
 
     class CanMoveResults:
@@ -315,6 +319,7 @@ class Game:
         Returns NotAdjacent if the two positions are not adjacent and adjacent movements are required.
         Returns NewPositionOccupied if there's already a piece at the target location.
         Returns WrongState if the game is not in a movement state
+        Returns RecreateBrokenMill if the player moves back the same piece to the mill it broke the previous turn.
 
         Keyword arguments:
         position -- the position we move from
@@ -334,6 +339,9 @@ class Game:
             return Game.CanMoveResults.NewPositionOccupied
         if (self.check_if_mill_is_ok(self.board[position], new_position) == False):
             return Game.CanMoveResults.OldMillAtPosition
+
+        
+
 
         moved_piece = self.board[position]
         total_on_board = self.board.pieces_of_type_on_board(moved_piece)
@@ -358,3 +366,32 @@ class Game:
             if (self.can_move_piece(position, i, ignore_turn) == Game.CanMoveResults.Ok):
                 valid_moves.append(i)
         return valid_moves
+
+
+    def serialize(self):
+
+        players_json = [self.players[0].serialize(), self.players[1].serialize()]
+
+        json = {
+            "board": self.board.serialize(),
+            "turn": Piece.serialize(self.turn),
+            "stage": "placing" if self.state == Game.GameStage.Placing else "moving",
+            "eliminating": self.eliminating,
+            "total_turns": self.total_turns,
+            "players": players_json
+        }
+        return json
+
+    @staticmethod
+    def deserialize(json_object):
+        game = Game()
+        game.board = Board.deserialize(json_object["board"])
+        game.turn = Piece.deserialize(json_object["turn"])
+        game.state = Game.GameStage.Placing if json_object["stage"] == "placing" else Game.GameStage.Moving
+        game.eliminating = json_object["eliminating"]
+        game.total_turns = json_object["total_turns"]
+        game.players[0] = Player.deserialize(json_object["players"][0])
+        game.players[1] = Player.deserialize(json_object["players"][1])
+
+
+        return game

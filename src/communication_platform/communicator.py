@@ -1,13 +1,15 @@
-from game.tournament import Tournament
-from game.game_result import GameResult
-from game.player import AIPlayer, Classification
-from ui.text_ui import TextUI, State, bcolors, AI_DIFFS
-from communication.server import Server, CommunicationMessage, NetworkData
-from communication.client import Client
+from .game.tournament import Tournament
+from .game.game_result import GameResult
+from .game.player import AIPlayer, Classification
+from .ui.text_ui import TextUI, State, bcolors, AI_DIFFS
+from .communication.server import Server, CommunicationMessage, NetworkData
+from .communication.client import Client
+from ..game_platform import CommandLine, Game, Piece
 import random
 import time
 import sys
 import atexit
+import json
 
 SERVER_SIZE = 8
 ONE_V_ONE = 2
@@ -19,7 +21,7 @@ def ai_to_list(ai):
     return result
 
 
-class Main:
+class Communicator:
     """
     Main-class that runs the program
     """
@@ -167,10 +169,27 @@ class Main:
             # Client disconnected, host won on walk over.
             self._walk_over_victory(white_host)
             return
-        # TODO start host vs player
-        # TODO remove demo code
-        print('Starting host vs player')
-        self._randomize_game_result_demo(white_host, black_player)
+    
+        self.comm.write(NetworkData(
+            match, CommunicationMessage.START_GAME, black_player.username))
+
+        game = None
+        message = self.comm.read()
+        if (message.message == CommunicationMessage.GAME_STATE):
+            game = Game.deserialize(json.loads(message.data))
+        
+        cmd = CommandLine(game)
+        self._play_to_end(cmd, black_player.username, Piece.White)
+
+        winner = white_host
+        if (cmd.game.check_if_piece_won_game(Piece.Black)):
+            winner = black_player
+
+        game_result = GameResult(None, winner)
+        self.tournament.match_ended(game_result)
+        self.comm.write(NetworkData(self.tournament,
+                                    CommunicationMessage.UPDATED_TOURNAMENT))
+
 
     def _start_player_vs_host(self, match):
         """
@@ -183,11 +202,18 @@ class Main:
             # Client disconnected, host won on walk over.
             self._walk_over_victory(black_host)
             return
-        # TODO start player vs host
-        # TODO remove demo code
-        print('Start player vs host')
+
         self.comm.write(NetworkData(
             match, CommunicationMessage.START_GAME, white_player.username))
+
+        game = Game()
+        self.comm.write(NetworkData(
+            json.dumps(game.serialize()), CommunicationMessage.GAME_STATE
+        ))
+
+        cmd = CommandLine(game)
+        self._play_to_end(cmd, white_player.username, Piece.Black)
+
         network_data = self.comm.read()
         if network_data.message == CommunicationMessage.GAME_RESULT:
             self.tournament.match_ended(network_data.data)
@@ -221,13 +247,19 @@ class Main:
         self.comm.write(NetworkData(
             match, CommunicationMessage.START_GAME, black_player.username))
 
-        # TODO coordinate player vs player match
-        # TODO remove demo code
-        network_data = self.comm.read()
-        if network_data.message == CommunicationMessage.GAME_RESULT:
-            self.tournament.match_ended(network_data.data)
-            self.comm.write(NetworkData(self.tournament,
-                                        CommunicationMessage.UPDATED_TOURNAMENT))
+        while (True):
+            network_data = self.comm.read()
+
+            if (network_data.sender == white_player.username):
+                self.comm.write(NetworkData(network_data.data, network_data.message, black_player.username))
+            if (network_data.sender == black_player.username):
+                self.comm.write(NetworkData(network_data.data, network_data.message, white_player.username))
+
+            if network_data.message == CommunicationMessage.GAME_RESULT:
+                self.tournament.match_ended(network_data.data)
+                self.comm.write(NetworkData(self.tournament,
+                                            CommunicationMessage.UPDATED_TOURNAMENT))
+                break
 
     def _start_ai_vs_player(self, match):
         """
@@ -267,19 +299,40 @@ class Main:
 
     def _start_local_match(self, match):
         """
-        Used to start a local played match, i.e. starting the game for the player
+        Used to start a local played match, i.e. starting the game for the client player
         :param match: The match that are to be started
         """
         white_player, black_player = match
-        # TODO start player vs player
-        # TODO remove demo code
-        if white_player.username == self.username:
-            print('Starting local match')
-            time.sleep(1)
-            random_result = GameResult(
-                None, random.choice((white_player, black_player)))
+
+        is_white = white_player.username == self.username
+        my_piece = Piece.White if is_white else Piece.Black
+        game = None
+
+        if (my_piece == Piece.Black):
+            game = Game()
             self.comm.write(NetworkData(
-                random_result, CommunicationMessage.GAME_RESULT))
+                json.dumps(game.serialize()), CommunicationMessage.GAME_STATE
+            ))
+        
+        else:
+            data = self.comm.read()
+            if (data.message == CommunicationMessage.GAME_STATE):
+                game = Game.deserialize(json.loads(data.data))
+
+        cmd = CommandLine(game)
+        self._play_to_end(cmd, "", my_piece)
+
+
+        # White player is the one sending the result
+        if is_white:
+            winner = white_player
+            if (cmd.game.check_if_piece_won_game(Piece.Black)):
+                winner = black_player
+
+            game_result = GameResult(None, winner)
+
+            self.comm.write(NetworkData(
+                game_result, CommunicationMessage.GAME_RESULT))
         else:
             network_data = self.comm.read()
             if network_data.message == CommunicationMessage.UPDATED_TOURNAMENT:
@@ -506,9 +559,30 @@ class Main:
         self.comm.write(NetworkData(self.tournament,
                                     CommunicationMessage.UPDATED_TOURNAMENT))
 
+    def _play_to_end(self, cmd : CommandLine, target, my_piece):
+        while (True):
+            if (cmd.game.turn == my_piece):
+                cmd.print_board()
+                cmd.play()
+                self.comm.write(NetworkData(
+                json.dumps(cmd.game.serialize()), CommunicationMessage.GAME_STATE, target
+                ))
+
+            else:
+                cmd.print_board()
+                print("Waiting on the other player")
+                data = self.comm.read()
+                if (data.message == CommunicationMessage.GAME_STATE):
+                    cmd.game = Game.deserialize(json.loads(data.data))
+
+            if (cmd.game.check_if_piece_won_game(Piece.Black)):
+                return
+            if (cmd.game.check_if_piece_won_game(Piece.White)):
+                return
+
 
 if __name__ == '__main__':
-    m = Main()
+    m = Communicator()
     atexit.register(m.quit_comm)
     try:
         m.start()

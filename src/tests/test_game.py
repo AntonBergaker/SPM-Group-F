@@ -1,5 +1,6 @@
 import unittest
 from src.game_platform import Game, Piece
+import json
 
 class TestGame(unittest.TestCase):
     def test_turn_changed(self):
@@ -132,6 +133,27 @@ class TestGame(unittest.TestCase):
         self.assertEqual(Game.CanMoveResults.Ok, result)
         game.move_piece(3, 0)
         self.assertEqual(True, game.eliminating)
+
+    def test_serialization(self):
+        game = Game(5)
+        game.place_piece(game.turn, 0)
+        game.place_piece(game.turn, 1)
+        game.place_piece(game.turn, 2)
+
+        game_json = json.dumps(game.serialize())
+        new_game = Game.deserialize( json.loads(game_json) )
+
+        self.assertEqual(game.turn, new_game.turn)
+        self.assertEqual(game.state, new_game.state)
+        self.assertEqual(game.players[0].pieces_amount, new_game.players[0].pieces_amount)
+        self.assertEqual(game.players[1].pieces_amount, new_game.players[1].pieces_amount)
+        self.assertEqual(game.total_turns, new_game.total_turns)
+
+        for i in range(game.board.position_count):
+            self.assertEqual(game.board[i], new_game.board[i])
+
+        print(game_json)
+
 
 if __name__ == '__main__':
     unittest.main()
